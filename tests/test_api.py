@@ -2,7 +2,7 @@
 
 import pytest
 from django.contrib.auth import get_user_model
-from django.test import RequestFactory
+from rest_framework.test import APIRequestFactory
 
 from iil_learnfw.api.viewsets import (
     CategoryViewSet,
@@ -20,7 +20,7 @@ User = get_user_model()
 
 @pytest.fixture
 def factory():
-    return RequestFactory()
+    return APIRequestFactory()
 
 
 @pytest.fixture
