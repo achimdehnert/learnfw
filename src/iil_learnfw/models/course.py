@@ -30,6 +30,29 @@ class TenantMixin(models.Model):
         abstract = True
 
 
+class CourseManager(models.Manager):
+    """Custom manager: includes is_global courses for tenant queries (ADR-139).
+
+    Usage:
+        Course.objects.for_tenant(tenant_id)
+        → Q(tenant_id=tid) | Q(is_global=True)
+    """
+
+    def for_tenant(self, tenant_id):
+        """Return courses visible to a tenant: own + global."""
+        return self.get_queryset().filter(
+            models.Q(tenant_id=tenant_id) | models.Q(is_global=True)
+        )
+
+    def published(self):
+        """Return only published courses."""
+        return self.get_queryset().filter(status="published")
+
+    def for_tenant_published(self, tenant_id):
+        """Return published courses visible to a tenant."""
+        return self.for_tenant(tenant_id).filter(status="published")
+
+
 class Category(TenantMixin):
     """Course category for grouping."""
 
@@ -54,6 +77,8 @@ class Category(TenantMixin):
 
 class Course(TenantMixin):
     """A learning course containing chapters and lessons."""
+
+    objects = CourseManager()
 
     STATUS_CHOICES = [
         ("draft", "Draft"),
