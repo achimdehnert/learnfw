@@ -1,0 +1,62 @@
+[project]
+name = "iil-learnfw"
+version = "0.1.0"
+description = "Django Learning Platform Framework — Courses, Quizzes, Certificates, Gamification, SCORM"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [
+    {name = "Achim Dehnert", email = "achim@dehnert.com"}
+]
+keywords = ["django", "learning", "lms", "courses", "quiz", "certificates", "gamification", "scorm", "multi-tenant"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Framework :: Django :: 5.0",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Education",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+
+dependencies = [
+    "Django>=5.0,<6.0",
+]
+
+[project.optional-dependencies]
+api = ["djangorestframework>=3.15", "drf-spectacular>=0.27"]
+tenancy = ["django-tenancy>=0.2"]
+certificates = ["weasyprint>=62", "qrcode>=7"]
+pptx = ["python-pptx>=1.0"]
+scorm = ["lxml>=5.0"]
+markdown = ["markdown>=3.6", "pymdown-extensions>=10"]
+all = ["iil-learnfw[api,tenancy,certificates,pptx,scorm,markdown]"]
+dev = [
+    "pytest>=8.0",
+    "pytest-django>=4.8",
+    "pytest-asyncio>=0.23",
+    "hatch",
+    "ruff",
+    "bandit",
+    "iil-testkit>=0.1",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/iil_learnfw"]
+sources = {"src" = ""}
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+asyncio_mode = "auto"
+pythonpath = ["src", "."]
+
+[tool.ruff]
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
