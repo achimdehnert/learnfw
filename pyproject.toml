@@ -1,6 +1,6 @@
 [project]
 name = "iil-learnfw"
-version = "0.1.0"
+version = "0.2.0"
 description = "Django Learning Platform Framework — Courses, Quizzes, Certificates, Gamification, SCORM"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -36,6 +36,7 @@ dev = [
     "pytest>=8.0",
     "pytest-django>=4.8",
     "pytest-asyncio>=0.23",
+    "djangorestframework>=3.15",
     "hatch",
     "ruff",
     "bandit",
