@@ -4,8 +4,12 @@ Consumer-Hubs include this in their urls.py:
     path("schulungen/", include("iil_learnfw.urls"))
 """
 
+from django.urls import path
+
+from . import views
+
 app_name = "iil_learnfw"
 
 urlpatterns: list = [
-    # Phase 1: Placeholder — views will be added incrementally
+    path("", views.course_list, name="course-list"),
 ]
