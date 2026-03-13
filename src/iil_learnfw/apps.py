@@ -11,8 +11,13 @@ class IilLearnfwConfig(AppConfig):
     default_auto_field = "django.db.models.BigAutoField"
 
     def ready(self):
-        """Import signals on app ready."""
+        """Import signals and register system checks on app ready."""
         try:
             from . import signals  # noqa: F401
+        except ImportError:
+            pass
+        # ADR-142: Assessment Engine system checks (ADR-083 compliant)
+        try:
+            from . import checks  # noqa: F401
         except ImportError:
             pass

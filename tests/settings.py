@@ -32,4 +32,10 @@ IIL_LEARNFW = {
     "TENANT_AWARE": False,
     "AUTHORING_ENABLED": True,
     "GAMIFICATION_ENABLED": True,
+    # Assessment Engine (ADR-142)
+    "ASSESSMENT_ENGINE_ENABLED": True,
+    "ASSESSMENT_REPORT_ENGINE": "none",
+    "ASSESSMENT_LEAD_CAPTURE": False,
+    "ASSESSMENT_IP_HASH_SALT": "test-salt-not-for-production",
+    "DEFAULT_TENANT_ID": "00000000-0000-0000-0000-000000000000",
 }

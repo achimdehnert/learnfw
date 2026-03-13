@@ -3,6 +3,11 @@
 from rest_framework.routers import DefaultRouter
 
 from . import viewsets
+from .assessment_engine_viewsets import (
+    AssessmentAttemptViewSet,
+    AssessmentReportViewSet,
+    AssessmentTypeViewSet,
+)
 
 router = DefaultRouter()
 router.register("categories", viewsets.CategoryViewSet)
@@ -15,5 +20,9 @@ router.register("certificates", viewsets.CertificateViewSet, basename="certifica
 router.register("badges", viewsets.BadgeViewSet, basename="badge")
 router.register("leaderboard", viewsets.LeaderboardViewSet, basename="leaderboard")
 router.register("my-points", viewsets.MyPointsViewSet, basename="my-points")
+# Assessment Engine (ADR-142)
+router.register("assessments/types", AssessmentTypeViewSet, basename="assessment-type")
+router.register("assessments/attempts", AssessmentAttemptViewSet, basename="assessment-attempt")
+router.register("assessments/reports", AssessmentReportViewSet, basename="assessment-report")
 
 urlpatterns = router.urls
