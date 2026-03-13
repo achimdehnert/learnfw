@@ -482,7 +482,7 @@ class AssessmentAttempt(TenantMixin):
             ),
             models.Index(
                 fields=["tenant_id", "deleted_at", "-started_at"],
-                name="idx_attempt_tenant_deleted_date",
+                name="idx_attempt_tenant_del_date",
             ),
             models.Index(
                 fields=["retention_expires_at"],
