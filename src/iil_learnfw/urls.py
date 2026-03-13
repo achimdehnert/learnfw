@@ -12,4 +12,5 @@ app_name = "iil_learnfw"
 
 urlpatterns: list = [
     path("", views.course_list, name="course-list"),
+    path("<slug:slug>/", views.course_detail, name="course-detail"),
 ]
