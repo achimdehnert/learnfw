@@ -27,6 +27,18 @@ DEFAULTS = {
     "POINTS_PER_LESSON": 10,
     "POINTS_PER_QUIZ_PASS": 50,
     "STREAK_THRESHOLD_DAYS": 1,
+    # Grading (ADR-150)
+    "GRADING_ENABLED": False,
+    "GRADING_API_KEY": "",
+    "GRADING_API_BASE": "https://api.openai.com/v1",
+    "GRADING_MODEL": "gpt-4o-mini",
+    "GRADING_TIMEOUT": 15.0,
+    "GRADING_SYSTEM_PROMPT": "",
+    # Assessment Engine (ADR-142/150)
+    "ASSESSMENT_ENGINE_ENABLED": True,
+    "ASSESSMENT_REPORT_ENGINE": "none",  # "weasyprint" | "none"
+    "ASSESSMENT_IP_HASH_SALT": "",
+    "DEFAULT_TENANT_ID": "00000000-0000-0000-0000-000000000000",
 }
 
 

@@ -1,0 +1,1 @@
+/home/dehnert/github/platform/.windsurf/workflows/agentic-coding.md

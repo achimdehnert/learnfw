@@ -1,6 +1,6 @@
 [project]
 name = "iil-learnfw"
-version = "0.3.0"
+version = "0.4.0"
 description = "Django Learning Platform Framework — Courses, Quizzes, Certificates, Gamification, SCORM"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -31,7 +31,8 @@ certificates = ["weasyprint>=62", "qrcode>=7"]
 pptx = ["python-pptx>=1.0"]
 scorm = ["lxml>=5.0"]
 markdown = ["markdown>=3.6", "pymdown-extensions>=10"]
-all = ["iil-learnfw[api,tenancy,certificates,pptx,scorm,markdown]"]
+grading = ["httpx>=0.27"]
+all = ["iil-learnfw[api,tenancy,certificates,grading,pptx,scorm,markdown]"]
 dev = [
     "pytest>=8.0",
     "pytest-django>=4.8",

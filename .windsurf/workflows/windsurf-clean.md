@@ -1,0 +1,1 @@
+/home/dehnert/github/platform/.windsurf/workflows/windsurf-clean.md
