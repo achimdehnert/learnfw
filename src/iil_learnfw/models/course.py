@@ -137,6 +137,11 @@ class Chapter(TenantMixin):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="chapters")
     title = models.CharField(max_length=300)
     description = models.TextField(blank=True)
+    self_test = models.JSONField(
+        null=True,
+        blank=True,
+        help_text='[{"question":"...","expected":"...","keywords":["k1"]}]',
+    )
     ordering = models.PositiveIntegerField(default=0)
 
     class Meta:

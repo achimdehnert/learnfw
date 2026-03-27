@@ -1,6 +1,6 @@
 [project]
 name = "iil-learnfw"
-version = "0.5.1"
+version = "0.5.2"
 description = "Django Learning Platform Framework — Courses, Quizzes, Certificates, Gamification, SCORM"
 readme = "README.md"
 requires-python = ">=3.11"
