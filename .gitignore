@@ -20,3 +20,6 @@ htmlcov/
 .mypy_cache/
 .tox/
 *.log
+
+# IDE agent workflows (symlinked, not repo-specific)
+.windsurf/
