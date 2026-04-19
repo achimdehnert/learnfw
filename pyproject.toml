@@ -1,6 +1,6 @@
 [project]
 name = "iil-learnfw"
-version = "0.5.2"
+version = "0.5.3"
 description = "Django Learning Platform Framework — Courses, Quizzes, Certificates, Gamification, SCORM"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -12,6 +12,7 @@ keywords = ["django", "learning", "lms", "courses", "quiz", "certificates", "gam
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Framework :: Django :: 5.0",
+    "Framework :: Django :: 5.2",
     "Intended Audience :: Developers",
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3.11",
@@ -21,7 +22,7 @@ classifiers = [
 ]
 
 dependencies = [
-    "Django>=5.0,<6.0",
+    "Django>=5.0",
 ]
 
 [project.optional-dependencies]
