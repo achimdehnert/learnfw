@@ -3,7 +3,7 @@ name = "iil-learnfw"
 version = "0.5.3"
 description = "Django Learning Platform Framework — Courses, Quizzes, Certificates, Gamification, SCORM"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [
     {name = "Achim Dehnert", email = "achim@dehnert.com"}
