@@ -141,11 +141,11 @@ class AssessmentType(TenantMixin):
         verbose_name_plural = _("Assessment-Typen")
         constraints = [
             models.CheckConstraint(
-                check=models.Q(scale_min__lt=models.F("scale_max")),
+                condition=models.Q(scale_min__lt=models.F("scale_max")),
                 name="assessment_type_scale_min_lt_max",
             ),
             models.CheckConstraint(
-                check=models.Q(passing_score__lte=100),
+                condition=models.Q(passing_score__lte=100),
                 name="assessment_type_passing_score_max_100",
             ),
         ]
@@ -310,11 +310,11 @@ class AssessmentMaturityLevel(TenantMixin):
         verbose_name_plural = _("Assessment-Reifegrade")
         constraints = [
             models.CheckConstraint(
-                check=models.Q(pct_min__lte=models.F("pct_max")),
+                condition=models.Q(pct_min__lte=models.F("pct_max")),
                 name="assessment_maturity_pct_min_lte_max",
             ),
             models.CheckConstraint(
-                check=models.Q(pct_max__lte=100),
+                condition=models.Q(pct_max__lte=100),
                 name="assessment_maturity_pct_max_lte_100",
             ),
             models.UniqueConstraint(
@@ -384,7 +384,7 @@ class AssessmentRecommendation(TenantMixin):
         verbose_name_plural = _("Assessment-Empfehlungen")
         constraints = [
             models.CheckConstraint(
-                check=models.Q(threshold_below_pct__lte=100),
+                condition=models.Q(threshold_below_pct__lte=100),
                 name="assessment_rec_threshold_lte_100",
             ),
         ]
@@ -492,7 +492,7 @@ class AssessmentAttempt(TenantMixin):
         ]
         constraints = [
             models.CheckConstraint(
-                check=models.Q(total_pct__lte=100),
+                condition=models.Q(total_pct__lte=100),
                 name="assessment_attempt_total_pct_lte_100",
             ),
         ]
