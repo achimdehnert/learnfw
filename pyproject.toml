@@ -42,7 +42,6 @@ dev = [
     "hatch",
     "ruff",
     "bandit",
-    "iil-testkit>=0.1",
 ]
 
 [build-system]
