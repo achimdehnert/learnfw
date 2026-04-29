@@ -12,9 +12,9 @@ Korrekturen gegenüber ADR-142-PROPOSED:
 """
 from __future__ import annotations
 
+import dataclasses
 import logging
 from abc import ABC, abstractmethod
-import dataclasses
 from dataclasses import dataclass, field
 from decimal import ROUND_HALF_UP, Decimal
 from typing import Any

@@ -25,7 +25,6 @@ from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet, ReadOnlyModelViewSet
 
 from iil_learnfw.api.assessment_engine_serializers import (
-    AssessmentAttemptResultSerializer,
     AssessmentResultSerializer,
     AssessmentSubmitSerializer,
     AssessmentTypeDetailSerializer,

@@ -15,7 +15,6 @@ from iil_learnfw.models.assessment_engine import (
     AssessmentDimension,
     AssessmentMaturityLevel,
     AssessmentQuestion,
-    AssessmentReport,
     AssessmentType,
 )
 

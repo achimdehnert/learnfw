@@ -112,8 +112,9 @@ class RecommendationService:
         Verwendung: PDF-Report-Generator, um Empfehlungen bei Report-Generierung
         neu zu berechnen (falls Recommendations seit Submit aktualisiert wurden).
         """
-        from iil_learnfw.services.assessment_scoring import DimensionResult  # noqa: PLC0415
         from decimal import Decimal
+
+        from iil_learnfw.services.assessment_scoring import DimensionResult  # noqa: PLC0415
 
         dim_results = [
             DimensionResult(

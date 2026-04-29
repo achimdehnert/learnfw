@@ -26,10 +26,9 @@ import dataclasses
 import hashlib
 import logging
 import uuid as uuid_mod
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
-from asgiref.sync import async_to_sync
 from django.conf import settings
 from django.db import transaction
 from django.utils import timezone as django_timezone
@@ -384,7 +383,7 @@ class AssessmentService:
 
         # NEU-H4: Lücken-Prüfung (fehlende Prozentbereiche)
         if levels and not errors:
-            sorted_levels = sorted(levels, key=lambda l: l.pct_min)
+            sorted_levels = sorted(levels, key=lambda lvl: lvl.pct_min)
             if sorted_levels[0].pct_min > 0:
                 errors.append(
                     f"Lücke: 0-{sorted_levels[0].pct_min - 1}% ist keinem Reifegrad zugeordnet."

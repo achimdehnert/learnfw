@@ -3,7 +3,6 @@
 import pytest
 
 from iil_learnfw.services.dimension_scoring import (
-    ScoreResult,
     _risk_level,
     calculate_dimension_score,
 )

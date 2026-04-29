@@ -20,7 +20,6 @@ import uuid
 from decimal import Decimal
 
 import pytest
-from django.test import TestCase
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -147,6 +146,7 @@ class TestPlatformStandardsBigAutoField:
     @pytest.mark.django_db
     def test_all_models_have_big_auto_pk(self):
         from django.db import models
+
         from iil_learnfw.models.assessment_engine import (
             AssessmentAttempt,
             AssessmentDimension,
@@ -176,6 +176,7 @@ class TestPlatformStandardsPublicId:
     @pytest.mark.django_db
     def test_all_models_have_public_id(self):
         from django.db import models
+
         from iil_learnfw.models.assessment_engine import (
             AssessmentAttempt,
             AssessmentDimension,
@@ -240,8 +241,13 @@ class TestPlatformStandardsSoftDelete:
     @pytest.mark.django_db
     def test_all_models_have_deleted_at(self):
         from iil_learnfw.models.assessment_engine import (
-            AssessmentAttempt, AssessmentDimension, AssessmentMaturityLevel,
-            AssessmentQuestion, AssessmentRecommendation, AssessmentReport, AssessmentType,
+            AssessmentAttempt,
+            AssessmentDimension,
+            AssessmentMaturityLevel,
+            AssessmentQuestion,
+            AssessmentRecommendation,
+            AssessmentReport,
+            AssessmentType,
         )
         for model_cls in [
             AssessmentType, AssessmentDimension, AssessmentQuestion,
@@ -651,7 +657,8 @@ class TestAssessmentServiceIntegration:
         self, assessment_type, dimensions, questions, maturity_levels, tenant_id
     ):
         from iil_learnfw.services.assessment_service import (
-            AssessmentService, AssessmentValidationError,
+            AssessmentService,
+            AssessmentValidationError,
         )
         attempt = AssessmentService.start_attempt(
             assessment_type_slug=assessment_type.slug,

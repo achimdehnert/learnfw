@@ -16,7 +16,6 @@ from __future__ import annotations
 
 import importlib
 import logging
-import sys
 from typing import Any
 
 from django.core.management.base import BaseCommand, CommandError
@@ -118,6 +117,8 @@ class Command(BaseCommand):
         reset:     bool,
         dry_run:   bool,
     ) -> None:
+        from django.utils import timezone  # noqa: PLC0415
+
         from iil_learnfw.models.assessment_engine import (  # noqa: PLC0415
             AssessmentDimension,
             AssessmentMaturityLevel,
@@ -126,7 +127,6 @@ class Command(BaseCommand):
             AssessmentType,
         )
         from iil_learnfw.services.assessment_service import AssessmentService  # noqa: PLC0415
-        from django.utils import timezone  # noqa: PLC0415
 
         module_path = AVAILABLE_SEEDS[seed_key]
         module      = importlib.import_module(module_path)
