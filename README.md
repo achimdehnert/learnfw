@@ -28,14 +28,14 @@ pip install "iil-learnfw[api,tenancy,certificates]"
 ```python
 # settings.py
 INSTALLED_APPS = [
-    "iil_learnfw",
+    "iil_learnfw",   # Python module name (pip package: iil-learnfw)
     ...
 ]
 
 IIL_LEARNFW = {
-    "TENANT_AWARE": True,
-    "AUTHORING_ENABLED": True,
-    "ENROLLMENT_MODE": "self_enroll",
+    "TENANT_AWARE": True,        # Enable multi-tenancy (requires `tenancy` extra)
+    "AUTHORING_ENABLED": True,   # Allow course creation via admin/API
+    "ENROLLMENT_MODE": "self_enroll",  # Options: self_enroll | invite_only | open
 }
 ```
 
@@ -58,6 +58,7 @@ urlpatterns = [
 | `pptx` | python-pptx | PPTX slide import, auto-split |
 | `scorm` | lxml | SCORM 1.2/2004 import/export |
 | `markdown` | markdown, pymdown-extensions | Markdown content rendering |
+| `grading` | httpx | External grading service integration |
 | `all` | All of the above | Full feature set |
 
 ## Modules
@@ -72,6 +73,21 @@ urlpatterns = [
 | `iil_learnfw.onboarding` | Mandatory courses, checklists |
 | `iil_learnfw.gamification` | Points, badges, streaks, leaderboards |
 | `iil_learnfw.scorm` | SCORM import/export |
+
+## Deployment
+
+Run migrations after installation:
+
+```bash
+python manage.py migrate
+```
+
+For multi-tenant setups, configure `TENANT_AWARE: True` in `IIL_LEARNFW` and ensure each request carries a `tenant_id` (see ADR-137).
+
+Production checklist:
+- Set `DEBUG=False` and configure `ALLOWED_HOSTS`
+- Configure media storage (PDF certificates, PPTX uploads)
+- Set `CACHES` to Redis for session/progress caching
 
 ## License
 
