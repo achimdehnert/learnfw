@@ -18,7 +18,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ---
 
-## [0.5.3] — Unreleased
+## [0.5.3] — 2026-04-21
 
 ### Added
-- Initial release.
+- `py.typed` marker — PEP 561 compliance, enables downstream type checking (ADR-155)
+- `Makefile` — standardized local development targets (platform-audit)
+- `MIT LICENSE` file
+
+### Changed
+- `requires-python = ">=3.12"` — aligns with platform-wide Python standard
+- `django>=5.0,<6.0` upper bound — compatibility scoping
+- `.windsurf/` excluded from sdist/wheel builds (`.gitignore` + hatch exclude)
