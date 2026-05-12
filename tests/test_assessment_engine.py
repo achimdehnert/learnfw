@@ -11,7 +11,7 @@ Abdeckung:
   - Tenant-Isolation
   - Seed-Idempotenz
 
-Anforderung ADR-141 (PostgreSQL Testing): Tests laufen gegen echte PG-DB,
+Anforderung ADR-179 (PostgreSQL Testing): Tests laufen gegen echte PG-DB,
 kein SQLite. Marker @pytest.mark.django_db(transaction=True) für Transaktions-Tests.
 """
 from __future__ import annotations
