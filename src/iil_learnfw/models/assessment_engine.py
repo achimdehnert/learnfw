@@ -20,6 +20,7 @@ Meta-Review-Korrekturen (NEU-K1, NEU-K2, NEU-R1):
   NEU-K2  Import-Pfad: TenantMixin lebt in iil_learnfw.models.course, nicht mixins
   NEU-R1  AssessmentQuestion.key-Feld für stabile Seed-Identifikation
 """
+
 from __future__ import annotations
 
 import uuid
@@ -44,15 +45,16 @@ _HEX_COLOR_VALIDATOR = RegexValidator(
 
 
 class ScoringStrategyChoices(models.TextChoices):
-    LIKERT          = "likert",           _("Likert-Skala (1-N)")
-    WEIGHTED_LIKERT = "weighted_likert",  _("Gewichtete Likert-Skala")
-    QUIZ            = "quiz",             _("Quiz (Richtig/Falsch)")
-    SURVEY          = "survey",           _("Umfrage (kein Scoring)")
+    LIKERT = "likert", _("Likert-Skala (1-N)")
+    WEIGHTED_LIKERT = "weighted_likert", _("Gewichtete Likert-Skala")
+    QUIZ = "quiz", _("Quiz (Richtig/Falsch)")
+    SURVEY = "survey", _("Umfrage (kein Scoring)")
 
 
 # ---------------------------------------------------------------------------
 # Soft-Delete Manager
 # ---------------------------------------------------------------------------
+
 
 class ActiveManager(models.Manager):
     """Standard-Manager: filtert soft-gelöschte Datensätze aus."""
@@ -63,12 +65,14 @@ class ActiveManager(models.Manager):
 
 class AllObjectsManager(models.Manager):
     """Manager inkl. soft-gelöschter Datensätze (für Admin / Reports)."""
+
     pass
 
 
 # ---------------------------------------------------------------------------
 # Konfigurationsmodelle
 # ---------------------------------------------------------------------------
+
 
 class AssessmentType(TenantMixin):
     """
@@ -78,61 +82,67 @@ class AssessmentType(TenantMixin):
     Scoring-Strategie, Skala, Reifegrade und Metadaten.
     """
 
-    id             = models.BigAutoField(primary_key=True)
-    public_id      = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True, db_index=True,
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
         verbose_name=_("Public ID"),
     )
-    key            = models.CharField(max_length=50, unique=True, verbose_name=_("Schlüssel"))
-    title          = models.CharField(max_length=300, verbose_name=_("Titel"))
-    slug           = models.SlugField(max_length=300, unique=True, verbose_name=_("Slug"))
-    description    = models.TextField(blank=True, verbose_name=_("Beschreibung"))
+    key = models.CharField(max_length=50, unique=True, verbose_name=_("Schlüssel"))
+    title = models.CharField(max_length=300, verbose_name=_("Titel"))
+    slug = models.SlugField(max_length=300, unique=True, verbose_name=_("Slug"))
+    description = models.TextField(blank=True, verbose_name=_("Beschreibung"))
     scoring_strategy = models.CharField(
         max_length=30,
         choices=ScoringStrategyChoices,
         default=ScoringStrategyChoices.LIKERT,
         verbose_name=_("Scoring-Strategie"),
     )
-    scale_min      = models.PositiveSmallIntegerField(default=1, verbose_name=_("Skalenminimum"))
-    scale_max      = models.PositiveSmallIntegerField(default=4, verbose_name=_("Skalenmaximum"))
-    scale_labels   = models.JSONField(
+    scale_min = models.PositiveSmallIntegerField(default=1, verbose_name=_("Skalenminimum"))
+    scale_max = models.PositiveSmallIntegerField(default=4, verbose_name=_("Skalenmaximum"))
+    scale_labels = models.JSONField(
         default=list,
         verbose_name=_("Skalen-Labels"),
         help_text=_('Schema: [{"value": 1, "label": "Trifft nicht zu"}, ...]'),
     )
-    is_public      = models.BooleanField(
-        default=False, verbose_name=_("Öffentlich (anonym ohne Login)"),
+    is_public = models.BooleanField(
+        default=False,
+        verbose_name=_("Öffentlich (anonym ohne Login)"),
     )
-    is_active      = models.BooleanField(default=True, verbose_name=_("Aktiv"))
-    course         = models.ForeignKey(
+    is_active = models.BooleanField(default=True, verbose_name=_("Aktiv"))
+    course = models.ForeignKey(
         "iil_learnfw.Course",
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="assessments",
         verbose_name=_("Verknüpfter Kurs"),
     )
-    passing_score          = models.PositiveSmallIntegerField(
+    passing_score = models.PositiveSmallIntegerField(
         default=0,
         verbose_name=_("Mindest-Prozentsatz zum Bestehen"),
         help_text=_("0 = kein Bestehen erforderlich. Wert in Prozent (0-100)."),
     )
-    certificate_enabled    = models.BooleanField(default=False, verbose_name=_("Zertifikat aktiviert"))
-    report_enabled         = models.BooleanField(default=True, verbose_name=_("Bericht aktiviert"))
-    reassessment_months    = models.PositiveSmallIntegerField(
-        default=6, verbose_name=_("Re-Assessment nach N Monaten"),
+    certificate_enabled = models.BooleanField(default=False, verbose_name=_("Zertifikat aktiviert"))
+    report_enabled = models.BooleanField(default=True, verbose_name=_("Bericht aktiviert"))
+    reassessment_months = models.PositiveSmallIntegerField(
+        default=6,
+        verbose_name=_("Re-Assessment nach N Monaten"),
     )
-    retention_days         = models.PositiveIntegerField(
+    retention_days = models.PositiveIntegerField(
         default=730,
         verbose_name=_("Aufbewahrungsfrist (Tage)"),
         help_text=_("DSGVO: Standard 730 Tage (24 Monate)."),
     )
 
     # Timestamps
-    created_at  = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
-    updated_at  = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
-    deleted_at  = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
 
-    objects     = ActiveManager()
+    objects = ActiveManager()
     all_objects = AllObjectsManager()
 
     class Meta:
@@ -161,9 +171,12 @@ class AssessmentDimension(TenantMixin):
     Beispiel: KI-Souveränität hat Dimensionen wie 'Datenkompetenz', 'KI-Governance'.
     """
 
-    id             = models.BigAutoField(primary_key=True)
-    public_id      = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True, db_index=True,
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
         verbose_name=_("Public ID"),
     )
     assessment_type = models.ForeignKey(
@@ -172,24 +185,27 @@ class AssessmentDimension(TenantMixin):
         related_name="dimensions",
         verbose_name=_("Assessment-Typ"),
     )
-    key         = models.CharField(max_length=50, verbose_name=_("Schlüssel"))
-    label       = models.CharField(max_length=200, verbose_name=_("Bezeichnung"))
-    weight      = models.DecimalField(
-        max_digits=4, decimal_places=2, default=1.0,
+    key = models.CharField(max_length=50, verbose_name=_("Schlüssel"))
+    label = models.CharField(max_length=200, verbose_name=_("Bezeichnung"))
+    weight = models.DecimalField(
+        max_digits=4,
+        decimal_places=2,
+        default=1.0,
         verbose_name=_("Gewichtung"),
         help_text=_("Wird von WeightedLikertScoring verwendet. Standard: 1.0"),
     )
-    sort_order  = models.PositiveSmallIntegerField(
-        default=0, verbose_name=_("Sortierreihenfolge"),
+    sort_order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=_("Sortierreihenfolge"),
     )
-    is_active   = models.BooleanField(default=True, verbose_name=_("Aktiv"))
+    is_active = models.BooleanField(default=True, verbose_name=_("Aktiv"))
 
     # Timestamps
-    created_at  = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
-    updated_at  = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
-    deleted_at  = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
 
-    objects     = ActiveManager()
+    objects = ActiveManager()
     all_objects = AllObjectsManager()
 
     class Meta:
@@ -217,40 +233,45 @@ class AssessmentQuestion(TenantMixin):
     Historische Attempts speichern Frage-Snapshot (assessment_service.submit_attempt).
     """
 
-    id             = models.BigAutoField(primary_key=True)
-    public_id      = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True, db_index=True,
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
         verbose_name=_("Public ID"),
     )
-    dimension   = models.ForeignKey(
+    dimension = models.ForeignKey(
         AssessmentDimension,
         on_delete=models.CASCADE,
         related_name="questions",
         verbose_name=_("Dimension"),
     )
-    key         = models.CharField(
-        max_length=100, blank=True,
+    key = models.CharField(
+        max_length=100,
+        blank=True,
         verbose_name=_("Stabiler Schlüssel"),
         help_text=_("Idempotenter Seed-Key (z.B. 'strat_gov_q1'). Leer = text-basierte Deduplizierung."),
     )
-    text        = models.TextField(verbose_name=_("Fragetext"))
-    help_text   = models.TextField(blank=True, verbose_name=_("Hilfetext"))
-    sort_order  = models.PositiveSmallIntegerField(
-        default=0, verbose_name=_("Sortierreihenfolge"),
+    text = models.TextField(verbose_name=_("Fragetext"))
+    help_text = models.TextField(blank=True, verbose_name=_("Hilfetext"))
+    sort_order = models.PositiveSmallIntegerField(
+        default=0,
+        verbose_name=_("Sortierreihenfolge"),
     )
-    is_active   = models.BooleanField(default=True, verbose_name=_("Aktiv"))
-    version     = models.PositiveSmallIntegerField(
+    is_active = models.BooleanField(default=True, verbose_name=_("Aktiv"))
+    version = models.PositiveSmallIntegerField(
         default=1,
         verbose_name=_("Version"),
         help_text=_("Wird bei Textänderungen inkrementiert. Historische Antworten bleiben zuordenbar."),
     )
 
     # Timestamps
-    created_at  = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
-    updated_at  = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
-    deleted_at  = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
 
-    objects     = ActiveManager()
+    objects = ActiveManager()
     all_objects = AllObjectsManager()
 
     class Meta:
@@ -271,9 +292,12 @@ class AssessmentMaturityLevel(TenantMixin):
     Überlappungsfreiheit wird im Service-Layer sichergestellt (kein DB-Constraint möglich).
     """
 
-    id             = models.BigAutoField(primary_key=True)
-    public_id      = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True, db_index=True,
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
         verbose_name=_("Public ID"),
     )
     assessment_type = models.ForeignKey(
@@ -282,26 +306,26 @@ class AssessmentMaturityLevel(TenantMixin):
         related_name="maturity_levels",
         verbose_name=_("Assessment-Typ"),
     )
-    key         = models.CharField(max_length=50, verbose_name=_("Schlüssel"))
-    label       = models.CharField(max_length=200, verbose_name=_("Bezeichnung"))
+    key = models.CharField(max_length=50, verbose_name=_("Schlüssel"))
+    label = models.CharField(max_length=200, verbose_name=_("Bezeichnung"))
     description = models.TextField(verbose_name=_("Beschreibung"))
-    color       = models.CharField(
+    color = models.CharField(
         max_length=7,
         validators=[_HEX_COLOR_VALIDATOR],
         verbose_name=_("Farbe (Hex)"),
     )
-    icon        = models.CharField(max_length=50, blank=True, verbose_name=_("Icon"))
+    icon = models.CharField(max_length=50, blank=True, verbose_name=_("Icon"))
     # K-6: pct_min/pct_max statt score_min/score_max — Einheit: Prozent (0-100)
-    pct_min     = models.PositiveSmallIntegerField(verbose_name=_("Mindest-Prozent"))
-    pct_max     = models.PositiveSmallIntegerField(verbose_name=_("Maximal-Prozent"))
-    sort_order  = models.PositiveSmallIntegerField(default=0, verbose_name=_("Sortierreihenfolge"))
+    pct_min = models.PositiveSmallIntegerField(verbose_name=_("Mindest-Prozent"))
+    pct_max = models.PositiveSmallIntegerField(verbose_name=_("Maximal-Prozent"))
+    sort_order = models.PositiveSmallIntegerField(default=0, verbose_name=_("Sortierreihenfolge"))
 
     # Timestamps
-    created_at  = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
-    updated_at  = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
-    deleted_at  = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
 
-    objects     = ActiveManager()
+    objects = ActiveManager()
     all_objects = AllObjectsManager()
 
     class Meta:
@@ -335,12 +359,15 @@ class AssessmentRecommendation(TenantMixin):
     Aktivierungsbedingung: `dimension.score_pct < threshold_below_pct`
     """
 
-    id             = models.BigAutoField(primary_key=True)
-    public_id      = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True, db_index=True,
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
         verbose_name=_("Public ID"),
     )
-    dimension       = models.ForeignKey(
+    dimension = models.ForeignKey(
         AssessmentDimension,
         on_delete=models.CASCADE,
         related_name="recommendations",
@@ -351,31 +378,33 @@ class AssessmentRecommendation(TenantMixin):
         verbose_name=_("Schwellenwert (%)"),
         help_text=_("Empfehlung aktiv wenn Dimensions-Score (%) unter diesem Wert liegt. 0-100."),
     )
-    title           = models.CharField(max_length=300, verbose_name=_("Titel"))
-    description     = models.TextField(verbose_name=_("Beschreibung"))
-    priority        = models.PositiveSmallIntegerField(default=0, verbose_name=_("Priorität"))
-    course          = models.ForeignKey(
+    title = models.CharField(max_length=300, verbose_name=_("Titel"))
+    description = models.TextField(verbose_name=_("Beschreibung"))
+    priority = models.PositiveSmallIntegerField(default=0, verbose_name=_("Priorität"))
+    course = models.ForeignKey(
         "iil_learnfw.Course",
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="recommended_by",
         verbose_name=_("Empfohlener Kurs"),
     )
-    lesson          = models.ForeignKey(
+    lesson = models.ForeignKey(
         "iil_learnfw.Lesson",
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="recommended_by",
         verbose_name=_("Empfohlene Lektion"),
     )
-    external_url    = models.URLField(blank=True, verbose_name=_("Externe URL"))
+    external_url = models.URLField(blank=True, verbose_name=_("Externe URL"))
 
     # Timestamps
-    created_at  = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
-    updated_at  = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
-    deleted_at  = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Erstellt am"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
 
-    objects     = ActiveManager()
+    objects = ActiveManager()
     all_objects = AllObjectsManager()
 
     class Meta:
@@ -397,6 +426,7 @@ class AssessmentRecommendation(TenantMixin):
 # Ergebnis-Modelle
 # ---------------------------------------------------------------------------
 
+
 class AssessmentAttempt(TenantMixin):
     """
     Eine Durchführung eines Assessments (Login-Nutzer oder anonym).
@@ -408,9 +438,12 @@ class AssessmentAttempt(TenantMixin):
     Maturity-Lookup: über `total_pct` (0-100), nicht `total_score` (K-6).
     """
 
-    id             = models.BigAutoField(primary_key=True)
-    public_id      = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True, db_index=True,
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
         verbose_name=_("Public ID"),
     )
     assessment_type = models.ForeignKey(
@@ -419,55 +452,57 @@ class AssessmentAttempt(TenantMixin):
         related_name="attempts",
         verbose_name=_("Assessment-Typ"),
     )
-    user            = models.ForeignKey(
+    user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         related_name="assessment_attempts",
         verbose_name=_("Benutzer"),
     )
     # Antwort-Snapshot (nicht rohe PKs — K-3)
-    answers         = models.JSONField(
+    answers = models.JSONField(
         default=dict,
         verbose_name=_("Antworten (Snapshot)"),
-        help_text=_(
-            'Schema: {str(question.public_id): {"question_text": "...", "value": 3, "question_version": 1}}'
-        ),
+        help_text=_('Schema: {str(question.public_id): {"question_text": "...", "value": 3, "question_version": 1}}'),
     )
     # Ergebnisse
-    scores          = models.JSONField(
+    scores = models.JSONField(
         default=dict,
         verbose_name=_("Dimensions-Scores"),
         help_text=_('Schema: {dimension_key: {"score": "2.75", "pct": 58, "weight": "1.00"}}'),
     )
-    total_score     = models.DecimalField(
-        max_digits=6, decimal_places=2, default=0,
+    total_score = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        default=0,
         verbose_name=_("Gesamt-Rohscore"),
     )
-    total_pct       = models.PositiveSmallIntegerField(
+    total_pct = models.PositiveSmallIntegerField(
         default=0,
         verbose_name=_("Gesamt-Prozent (0-100)"),
     )
-    maturity_level  = models.ForeignKey(
+    maturity_level = models.ForeignKey(
         AssessmentMaturityLevel,
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("Erreichter Reifegrad"),
     )
-    weakest_dimension   = models.CharField(max_length=50, blank=True, verbose_name=_("Schwächste Dimension"))
+    weakest_dimension = models.CharField(max_length=50, blank=True, verbose_name=_("Schwächste Dimension"))
     strongest_dimension = models.CharField(max_length=50, blank=True, verbose_name=_("Stärkste Dimension"))
 
     # Timing
-    started_at      = models.DateTimeField(auto_now_add=True, verbose_name=_("Gestartet am"))
-    completed_at    = models.DateTimeField(null=True, blank=True, verbose_name=_("Abgeschlossen am"))
-    updated_at      = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
+    started_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Gestartet am"))
+    completed_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Abgeschlossen am"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
 
     # DSGVO
-    ip_hash         = models.CharField(max_length=64, blank=True, verbose_name=_("IP-Hash"))
+    ip_hash = models.CharField(max_length=64, blank=True, verbose_name=_("IP-Hash"))
     retention_expires_at = models.DateTimeField(null=True, blank=True, verbose_name=_("Aufbewahrung endet am"))
-    deleted_at      = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
 
-    objects     = ActiveManager()
+    objects = ActiveManager()
     all_objects = AllObjectsManager()
 
     class Meta:
@@ -509,12 +544,15 @@ class AssessmentReport(TenantMixin):
     (bewusste Denormalisierung für PDF-Unveränderlichkeit).
     """
 
-    id             = models.BigAutoField(primary_key=True)
-    public_id      = models.UUIDField(
-        default=uuid.uuid4, editable=False, unique=True, db_index=True,
+    id = models.BigAutoField(primary_key=True)
+    public_id = models.UUIDField(
+        default=uuid.uuid4,
+        editable=False,
+        unique=True,
+        db_index=True,
         verbose_name=_("Public ID"),
     )
-    attempt         = models.OneToOneField(
+    attempt = models.OneToOneField(
         AssessmentAttempt,
         on_delete=models.CASCADE,
         related_name="report",
@@ -523,30 +561,28 @@ class AssessmentReport(TenantMixin):
     recommendations = models.JSONField(
         default=list,
         verbose_name=_("Empfehlungs-Snapshot"),
-        help_text=_(
-            "Snapshot zum Generierungszeitpunkt. "
-            "Schema: [{dimension_key, gap_pct, title, description, priority, course_id, lesson_id, external_url}]"
-        ),
+        help_text=_("Snapshot zum Generierungszeitpunkt. Schema: [{dimension_key, gap_pct, title, description, priority, course_id, lesson_id, external_url}]"),
     )
     # H-4: Storage-Backend aus Platform-Context
-    pdf_file        = models.FileField(
+    pdf_file = models.FileField(
         upload_to="assessments/reports/%Y/%m/",
         blank=True,
         verbose_name=_("PDF-Datei"),
     )
-    certificate     = models.ForeignKey(
+    certificate = models.ForeignKey(
         "iil_learnfw.IssuedCertificate",
-        null=True, blank=True,
+        null=True,
+        blank=True,
         on_delete=models.SET_NULL,
         verbose_name=_("Ausgestelltes Zertifikat"),
     )
 
     # Timestamps
     generated_at = models.DateTimeField(auto_now_add=True, verbose_name=_("Generiert am"))
-    updated_at   = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
-    deleted_at   = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
+    updated_at = models.DateTimeField(auto_now=True, verbose_name=_("Aktualisiert am"))
+    deleted_at = models.DateTimeField(null=True, blank=True, db_index=True, verbose_name=_("Gelöscht am"))
 
-    objects     = ActiveManager()
+    objects = ActiveManager()
     all_objects = AllObjectsManager()
 
     class Meta:

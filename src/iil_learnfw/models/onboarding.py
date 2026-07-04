@@ -21,9 +21,7 @@ class OnboardingFlow(TenantMixin):
 
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True)
-    trigger = models.CharField(
-        max_length=20, choices=TRIGGER_CHOICES, default="first_login"
-    )
+    trigger = models.CharField(max_length=20, choices=TRIGGER_CHOICES, default="first_login")
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -37,9 +35,7 @@ class OnboardingFlow(TenantMixin):
 class OnboardingStep(TenantMixin):
     """A single step within an onboarding flow."""
 
-    flow = models.ForeignKey(
-        OnboardingFlow, on_delete=models.CASCADE, related_name="steps"
-    )
+    flow = models.ForeignKey(OnboardingFlow, on_delete=models.CASCADE, related_name="steps")
     course = models.ForeignKey(
         "iil_learnfw.Course",
         on_delete=models.SET_NULL,
@@ -81,15 +77,9 @@ class UserOnboardingState(TenantMixin):
         on_delete=models.CASCADE,
         related_name="learnfw_onboarding_states",
     )
-    flow = models.ForeignKey(
-        OnboardingFlow, on_delete=models.CASCADE, related_name="user_states"
-    )
-    step = models.ForeignKey(
-        OnboardingStep, on_delete=models.CASCADE, related_name="user_states"
-    )
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="pending"
-    )
+    flow = models.ForeignKey(OnboardingFlow, on_delete=models.CASCADE, related_name="user_states")
+    step = models.ForeignKey(OnboardingStep, on_delete=models.CASCADE, related_name="user_states")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
     completed_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:

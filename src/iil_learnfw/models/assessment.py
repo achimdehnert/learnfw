@@ -28,15 +28,9 @@ class Quiz(TenantMixin):
         related_name="quizzes",
     )
     title = models.CharField(max_length=300)
-    passing_score = models.PositiveIntegerField(
-        default=80, help_text="Minimum score (%) to pass."
-    )
-    max_attempts = models.PositiveIntegerField(
-        default=0, help_text="0 = unlimited attempts."
-    )
-    time_limit_minutes = models.PositiveIntegerField(
-        null=True, blank=True, help_text="Time limit in minutes (NULL = no limit)."
-    )
+    passing_score = models.PositiveIntegerField(default=80, help_text="Minimum score (%) to pass.")
+    max_attempts = models.PositiveIntegerField(default=0, help_text="0 = unlimited attempts.")
+    time_limit_minutes = models.PositiveIntegerField(null=True, blank=True, help_text="Time limit in minutes (NULL = no limit).")
     shuffle_questions = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -59,16 +53,10 @@ class Question(TenantMixin):
         ("matching", "Matching"),
     ]
 
-    quiz = models.ForeignKey(
-        Quiz, on_delete=models.CASCADE, related_name="questions"
-    )
-    question_type = models.CharField(
-        max_length=20, choices=QUESTION_TYPE_CHOICES, default="single_choice"
-    )
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="questions")
+    question_type = models.CharField(max_length=20, choices=QUESTION_TYPE_CHOICES, default="single_choice")
     text = models.TextField()
-    explanation = models.TextField(
-        blank=True, help_text="Shown after answering."
-    )
+    explanation = models.TextField(blank=True, help_text="Shown after answering.")
     points = models.PositiveIntegerField(default=1)
     ordering = models.PositiveIntegerField(default=0)
 
@@ -82,9 +70,7 @@ class Question(TenantMixin):
 class Answer(TenantMixin):
     """An answer option for MC/SC questions."""
 
-    question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name="answers"
-    )
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="answers")
     text = models.TextField()
     is_correct = models.BooleanField(default=False)
     ordering = models.PositiveIntegerField(default=0)
@@ -105,13 +91,14 @@ class Attempt(TenantMixin):
         on_delete=models.CASCADE,
         related_name="learnfw_attempts",
     )
-    quiz = models.ForeignKey(
-        Quiz, on_delete=models.CASCADE, related_name="attempts"
-    )
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name="attempts")
     started_at = models.DateTimeField(auto_now_add=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     score = models.DecimalField(
-        max_digits=5, decimal_places=2, null=True, blank=True,
+        max_digits=5,
+        decimal_places=2,
+        null=True,
+        blank=True,
         help_text="Score as percentage (0-100).",
     )
     passed = models.BooleanField(null=True, blank=True)
@@ -127,12 +114,8 @@ class Attempt(TenantMixin):
 class AttemptAnswer(TenantMixin):
     """A user's answer to a single question within an attempt."""
 
-    attempt = models.ForeignKey(
-        Attempt, on_delete=models.CASCADE, related_name="answers"
-    )
-    question = models.ForeignKey(
-        Question, on_delete=models.CASCADE, related_name="attempt_answers"
-    )
+    attempt = models.ForeignKey(Attempt, on_delete=models.CASCADE, related_name="answers")
+    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name="attempt_answers")
     selected_answer = models.ForeignKey(
         Answer,
         on_delete=models.SET_NULL,
@@ -141,9 +124,7 @@ class AttemptAnswer(TenantMixin):
         related_name="attempt_selections",
         help_text="Selected answer (MC/SC).",
     )
-    free_text = models.TextField(
-        blank=True, help_text="Free text response."
-    )
+    free_text = models.TextField(blank=True, help_text="Free text response.")
     is_correct = models.BooleanField(null=True, blank=True)
     points_awarded = models.PositiveIntegerField(default=0)
 

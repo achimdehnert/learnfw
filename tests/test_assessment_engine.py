@@ -14,6 +14,7 @@ Abdeckung:
 Anforderung ADR-179 (PostgreSQL Testing): Tests laufen gegen echte PG-DB,
 kein SQLite. Marker @pytest.mark.django_db(transaction=True) für Transaktions-Tests.
 """
+
 from __future__ import annotations
 
 import uuid
@@ -24,6 +25,7 @@ import pytest
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
+
 
 @pytest.fixture
 def tenant_id():
@@ -39,6 +41,7 @@ def other_tenant_id():
 def assessment_type(db, tenant_id):
     """Erstellt einen einfachen Likert-4-Punkte AssessmentType."""
     from iil_learnfw.models.assessment_engine import AssessmentType
+
     return AssessmentType.objects.create(
         key="test_ki",
         title="Test KI-Souveränität",
@@ -56,6 +59,7 @@ def assessment_type(db, tenant_id):
 def assessment_type_5pt(db, tenant_id):
     """5-Punkte Skala für K-1 Regression-Tests."""
     from iil_learnfw.models.assessment_engine import AssessmentType
+
     return AssessmentType.objects.create(
         key="test_nis2",
         title="Test NIS2",
@@ -72,60 +76,71 @@ def assessment_type_5pt(db, tenant_id):
 @pytest.fixture
 def dimensions(db, assessment_type, tenant_id):
     from iil_learnfw.models.assessment_engine import AssessmentDimension
+
     dims = []
-    for i, (key, label, weight) in enumerate([
-        ("governance",    "KI-Governance",    Decimal("1.5")),
-        ("datenkompetenz","Datenkompetenz",    Decimal("1.0")),
-        ("ethik",         "KI-Ethik",         Decimal("1.0")),
-    ]):
-        dims.append(AssessmentDimension.objects.create(
-            assessment_type=assessment_type,
-            tenant_id=tenant_id,
-            key=key,
-            label=label,
-            weight=weight,
-            sort_order=i,
-        ))
+    for i, (key, label, weight) in enumerate(
+        [
+            ("governance", "KI-Governance", Decimal("1.5")),
+            ("datenkompetenz", "Datenkompetenz", Decimal("1.0")),
+            ("ethik", "KI-Ethik", Decimal("1.0")),
+        ]
+    ):
+        dims.append(
+            AssessmentDimension.objects.create(
+                assessment_type=assessment_type,
+                tenant_id=tenant_id,
+                key=key,
+                label=label,
+                weight=weight,
+                sort_order=i,
+            )
+        )
     return dims
 
 
 @pytest.fixture
 def questions(db, dimensions, tenant_id):
     from iil_learnfw.models.assessment_engine import AssessmentQuestion
+
     qs = []
     for dim in dimensions:
         for j in range(3):
-            qs.append(AssessmentQuestion.objects.create(
-                dimension=dim,
-                tenant_id=tenant_id,
-                text=f"Frage {j+1} in {dim.key}",
-                sort_order=j,
-            ))
+            qs.append(
+                AssessmentQuestion.objects.create(
+                    dimension=dim,
+                    tenant_id=tenant_id,
+                    text=f"Frage {j + 1} in {dim.key}",
+                    sort_order=j,
+                )
+            )
     return qs
 
 
 @pytest.fixture
 def maturity_levels(db, assessment_type, tenant_id):
     from iil_learnfw.models.assessment_engine import AssessmentMaturityLevel
+
     levels_data = [
-        ("starter",       "Starter",         0,  24,  "#DC2626"),
-        ("entwicklung",   "In Entwicklung",  25, 49,  "#EA580C"),
-        ("fortgeschritt", "Fortgeschritten", 50, 74,  "#CA8A04"),
-        ("reif",          "KI-reif",         75, 100, "#16A34A"),
+        ("starter", "Starter", 0, 24, "#DC2626"),
+        ("entwicklung", "In Entwicklung", 25, 49, "#EA580C"),
+        ("fortgeschritt", "Fortgeschritten", 50, 74, "#CA8A04"),
+        ("reif", "KI-reif", 75, 100, "#16A34A"),
     ]
     levels = []
     for i, (key, label, pct_min, pct_max, color) in enumerate(levels_data):
-        levels.append(AssessmentMaturityLevel.objects.create(
-            assessment_type=assessment_type,
-            tenant_id=tenant_id,
-            key=key,
-            label=label,
-            description=f"Beschreibung {label}",
-            pct_min=pct_min,
-            pct_max=pct_max,
-            color=color,
-            sort_order=i,
-        ))
+        levels.append(
+            AssessmentMaturityLevel.objects.create(
+                assessment_type=assessment_type,
+                tenant_id=tenant_id,
+                key=key,
+                label=label,
+                description=f"Beschreibung {label}",
+                pct_min=pct_min,
+                pct_max=pct_max,
+                color=color,
+                sort_order=i,
+            )
+        )
     return levels
 
 
@@ -133,15 +148,16 @@ def maturity_levels(db, assessment_type, tenant_id):
 # B-1: BigAutoField PK
 # ---------------------------------------------------------------------------
 
+
 class TestPlatformStandardsBigAutoField:
     """B-1 Regression: Alle Modelle haben BigAutoField PK."""
 
     @pytest.mark.django_db
     def test_assessment_type_pk_is_bigautofield(self, assessment_type):
         from django.db import models
+
         field = type(assessment_type)._meta.get_field("id")
-        assert isinstance(field, models.BigAutoField), \
-            f"id sollte BigAutoField sein, ist aber {type(field).__name__}"
+        assert isinstance(field, models.BigAutoField), f"id sollte BigAutoField sein, ist aber {type(field).__name__}"
 
     @pytest.mark.django_db
     def test_all_models_have_big_auto_pk(self):
@@ -156,19 +172,24 @@ class TestPlatformStandardsBigAutoField:
             AssessmentReport,
             AssessmentType,
         )
+
         for model_cls in [
-            AssessmentType, AssessmentDimension, AssessmentQuestion,
-            AssessmentMaturityLevel, AssessmentRecommendation,
-            AssessmentAttempt, AssessmentReport,
+            AssessmentType,
+            AssessmentDimension,
+            AssessmentQuestion,
+            AssessmentMaturityLevel,
+            AssessmentRecommendation,
+            AssessmentAttempt,
+            AssessmentReport,
         ]:
             pk_field = model_cls._meta.get_field("id")
-            assert isinstance(pk_field, models.BigAutoField), \
-                f"{model_cls.__name__}.id ist kein BigAutoField (ist: {type(pk_field).__name__})"
+            assert isinstance(pk_field, models.BigAutoField), f"{model_cls.__name__}.id ist kein BigAutoField (ist: {type(pk_field).__name__})"
 
 
 # ---------------------------------------------------------------------------
 # B-2: public_id auf allen Modellen
 # ---------------------------------------------------------------------------
+
 
 class TestPlatformStandardsPublicId:
     """B-2 Regression: Alle User-Data-Modelle haben public_id UUIDField."""
@@ -186,42 +207,49 @@ class TestPlatformStandardsPublicId:
             AssessmentReport,
             AssessmentType,
         )
+
         for model_cls in [
-            AssessmentType, AssessmentDimension, AssessmentQuestion,
-            AssessmentMaturityLevel, AssessmentRecommendation,
-            AssessmentAttempt, AssessmentReport,
+            AssessmentType,
+            AssessmentDimension,
+            AssessmentQuestion,
+            AssessmentMaturityLevel,
+            AssessmentRecommendation,
+            AssessmentAttempt,
+            AssessmentReport,
         ]:
             field_names = [f.name for f in model_cls._meta.get_fields()]
-            assert "public_id" in field_names, \
-                f"{model_cls.__name__} hat kein public_id-Feld"
+            assert "public_id" in field_names, f"{model_cls.__name__} hat kein public_id-Feld"
             pk_field = model_cls._meta.get_field("public_id")
-            assert isinstance(pk_field, models.UUIDField), \
-                f"{model_cls.__name__}.public_id ist kein UUIDField"
+            assert isinstance(pk_field, models.UUIDField), f"{model_cls.__name__}.public_id ist kein UUIDField"
 
 
 # ---------------------------------------------------------------------------
 # B-3: UniqueConstraint (nicht unique_together)
 # ---------------------------------------------------------------------------
 
+
 class TestPlatformStandardsUniqueConstraint:
     """B-3 Regression: Kein unique_together auf Modellen."""
 
     def test_no_unique_together_on_dimension(self):
         from iil_learnfw.models.assessment_engine import AssessmentDimension
+
         meta = AssessmentDimension._meta
-        assert not meta.unique_together, \
-            "AssessmentDimension sollte kein unique_together haben (B-3: UniqueConstraint verwenden)"
+        assert not meta.unique_together, "AssessmentDimension sollte kein unique_together haben (B-3: UniqueConstraint verwenden)"
 
     def test_dimension_has_unique_constraint(self):
         from iil_learnfw.models.assessment_engine import AssessmentDimension
+
         constraint_names = [c.name for c in AssessmentDimension._meta.constraints]
-        assert any("dimension" in n and "key" in n for n in constraint_names), \
+        assert any("dimension" in n and "key" in n for n in constraint_names), (
             f"AssessmentDimension hat keinen UniqueConstraint für (assessment_type, key). Gefunden: {constraint_names}"
+        )
 
 
 # ---------------------------------------------------------------------------
 # B-4: Soft-Delete (deleted_at) auf allen Modellen
 # ---------------------------------------------------------------------------
+
 
 class TestPlatformStandardsSoftDelete:
     """B-4 Regression: Soft-Delete auf allen User-Data-Modellen."""
@@ -229,10 +257,12 @@ class TestPlatformStandardsSoftDelete:
     @pytest.mark.django_db
     def test_soft_delete_assessment_type(self, assessment_type):
         from django.utils import timezone
+
         assessment_type.deleted_at = timezone.now()
         assessment_type.save(update_fields=["deleted_at"])
 
         from iil_learnfw.models.assessment_engine import AssessmentType
+
         # Standard-Manager soll soft-gelöschte nicht liefern
         assert not AssessmentType.objects.filter(pk=assessment_type.pk).exists()
         # all_objects soll sie liefern
@@ -249,25 +279,31 @@ class TestPlatformStandardsSoftDelete:
             AssessmentReport,
             AssessmentType,
         )
+
         for model_cls in [
-            AssessmentType, AssessmentDimension, AssessmentQuestion,
-            AssessmentMaturityLevel, AssessmentRecommendation,
-            AssessmentAttempt, AssessmentReport,
+            AssessmentType,
+            AssessmentDimension,
+            AssessmentQuestion,
+            AssessmentMaturityLevel,
+            AssessmentRecommendation,
+            AssessmentAttempt,
+            AssessmentReport,
         ]:
             field_names = [f.name for f in model_cls._meta.get_fields()]
-            assert "deleted_at" in field_names, \
-                f"{model_cls.__name__} hat kein deleted_at-Feld (B-4)"
+            assert "deleted_at" in field_names, f"{model_cls.__name__} hat kein deleted_at-Feld (B-4)"
 
 
 # ---------------------------------------------------------------------------
 # K-1: scale_min/scale_max werden verwendet (kein hardcodiertes 4)
 # ---------------------------------------------------------------------------
 
+
 class TestLikertScoringScaleRespected:
     """K-1 Regression: LikertScoring beachtet assessment_type.scale_min/scale_max."""
 
     def _make_mock_question(self, dim_key="dim1", pk=1, public_id=None):
         from unittest.mock import MagicMock
+
         q = MagicMock()
         q.pk = pk
         q.public_id = public_id or uuid.uuid4()
@@ -278,6 +314,7 @@ class TestLikertScoringScaleRespected:
 
     def _make_mock_maturity(self, key, pct_min, pct_max):
         from unittest.mock import MagicMock
+
         m = MagicMock()
         m.key = key
         m.label = key.capitalize()
@@ -290,56 +327,45 @@ class TestLikertScoringScaleRespected:
     def test_5pt_scale_top_answer_gives_100pct(self):
         """Auf 5-Punkt-Skala muss Antwort=5 → 100% ergeben."""
         from iil_learnfw.services.assessment_scoring import LikertScoring
+
         q = self._make_mock_question()
         answers = {str(q.public_id): 5}
         maturity = [self._make_mock_maturity("top", 0, 100)]
 
-        result = LikertScoring().score(
-            questions=[q], answers=answers, dimensions=[],
-            maturity_levels=maturity, scale_min=1, scale_max=5
-        )
-        assert result.total_pct == 100, \
-            f"5-Punkt-Skala, Antwort=5 sollte 100% geben, bekam {result.total_pct}%"
+        result = LikertScoring().score(questions=[q], answers=answers, dimensions=[], maturity_levels=maturity, scale_min=1, scale_max=5)
+        assert result.total_pct == 100, f"5-Punkt-Skala, Antwort=5 sollte 100% geben, bekam {result.total_pct}%"
 
     def test_4pt_scale_top_answer_gives_100pct(self):
         """Auf 4-Punkt-Skala muss Antwort=4 → 100% ergeben."""
         from iil_learnfw.services.assessment_scoring import LikertScoring
+
         q = self._make_mock_question()
         answers = {str(q.public_id): 4}
         maturity = [self._make_mock_maturity("top", 0, 100)]
 
-        result = LikertScoring().score(
-            questions=[q], answers=answers, dimensions=[],
-            maturity_levels=maturity, scale_min=1, scale_max=4
-        )
-        assert result.total_pct == 100, \
-            f"4-Punkt-Skala, Antwort=4 sollte 100% geben, bekam {result.total_pct}%"
+        result = LikertScoring().score(questions=[q], answers=answers, dimensions=[], maturity_levels=maturity, scale_min=1, scale_max=4)
+        assert result.total_pct == 100, f"4-Punkt-Skala, Antwort=4 sollte 100% geben, bekam {result.total_pct}%"
 
     def test_4pt_scale_min_answer_gives_0pct(self):
         """Auf 4-Punkt-Skala muss Antwort=1 → 0% ergeben."""
         from iil_learnfw.services.assessment_scoring import LikertScoring
+
         q = self._make_mock_question()
         answers = {str(q.public_id): 1}
         maturity = [self._make_mock_maturity("bottom", 0, 100)]
 
-        result = LikertScoring().score(
-            questions=[q], answers=answers, dimensions=[],
-            maturity_levels=maturity, scale_min=1, scale_max=4
-        )
-        assert result.total_pct == 0, \
-            f"4-Punkt-Skala, Antwort=1 sollte 0% geben, bekam {result.total_pct}%"
+        result = LikertScoring().score(questions=[q], answers=answers, dimensions=[], maturity_levels=maturity, scale_min=1, scale_max=4)
+        assert result.total_pct == 0, f"4-Punkt-Skala, Antwort=1 sollte 0% geben, bekam {result.total_pct}%"
 
     def test_value_clamped_to_scale(self):
         """Werte außerhalb der Skala werden geclamppt."""
         from iil_learnfw.services.assessment_scoring import LikertScoring
+
         q = self._make_mock_question()
         answers = {str(q.public_id): 99}  # Weit außerhalb scale_max=4
         maturity = [self._make_mock_maturity("top", 0, 100)]
 
-        result = LikertScoring().score(
-            questions=[q], answers=answers, dimensions=[],
-            maturity_levels=maturity, scale_min=1, scale_max=4
-        )
+        result = LikertScoring().score(questions=[q], answers=answers, dimensions=[], maturity_levels=maturity, scale_min=1, scale_max=4)
         assert result.total_pct == 100  # Geclamppt auf 4 → 100%
 
 
@@ -347,13 +373,12 @@ class TestLikertScoringScaleRespected:
 # K-3: Antworten als Snapshot (public_id-basiert)
 # ---------------------------------------------------------------------------
 
+
 class TestAnswerSnapshot:
     """K-3 Regression: Submit speichert Snapshot mit question.public_id als Key."""
 
     @pytest.mark.django_db
-    def test_submit_stores_snapshot_format(
-        self, assessment_type, dimensions, questions, maturity_levels, tenant_id
-    ):
+    def test_submit_stores_snapshot_format(self, assessment_type, dimensions, questions, maturity_levels, tenant_id):
         from iil_learnfw.services.assessment_service import AssessmentService
 
         attempt = AssessmentService.start_attempt(
@@ -378,23 +403,20 @@ class TestAnswerSnapshot:
 
         # Snapshot-Wert muss question_text enthalten
         first_key = list(attempt.answers.keys())[0]
-        assert "question_text" in attempt.answers[first_key], \
-            "Snapshot sollte question_text enthalten"
-        assert "question_version" in attempt.answers[first_key], \
-            "Snapshot sollte question_version enthalten"
+        assert "question_text" in attempt.answers[first_key], "Snapshot sollte question_text enthalten"
+        assert "question_version" in attempt.answers[first_key], "Snapshot sollte question_version enthalten"
 
 
 # ---------------------------------------------------------------------------
 # K-2: Tenant-Isolation
 # ---------------------------------------------------------------------------
 
+
 class TestTenantIsolation:
     """K-2 Regression: Kein Cross-Tenant-Datenzugriff möglich."""
 
     @pytest.mark.django_db
-    def test_attempt_not_accessible_from_other_tenant(
-        self, assessment_type, dimensions, questions, maturity_levels, tenant_id, other_tenant_id
-    ):
+    def test_attempt_not_accessible_from_other_tenant(self, assessment_type, dimensions, questions, maturity_levels, tenant_id, other_tenant_id):
         from iil_learnfw.services.assessment_service import (
             AssessmentService,
             AssessmentValidationError,
@@ -417,6 +439,7 @@ class TestTenantIsolation:
             AssessmentService,
             AssessmentValidationError,
         )
+
         with pytest.raises(AssessmentValidationError):
             AssessmentService.start_attempt(
                 assessment_type_slug=assessment_type.slug,
@@ -428,11 +451,13 @@ class TestTenantIsolation:
 # K-4: WeightedLikertScoring
 # ---------------------------------------------------------------------------
 
+
 class TestWeightedLikertScoring:
     """K-4 Regression: WeightedLikertScoring berücksichtigt Gewichtungen."""
 
     def _make_questions_with_weights(self, dims_weights: list[tuple[str, Decimal]]):
         from unittest.mock import MagicMock
+
         questions = []
         for dk, weight in dims_weights:
             q = MagicMock()
@@ -446,6 +471,7 @@ class TestWeightedLikertScoring:
 
     def _make_maturity(self, pct_min, pct_max):
         from unittest.mock import MagicMock
+
         m = MagicMock()
         m.key, m.label, m.color, m.description = "mid", "Mid", "#aaa", ""
         m.pct_min, m.pct_max = pct_min, pct_max
@@ -455,14 +481,16 @@ class TestWeightedLikertScoring:
         """Mit identischen Gewichtungen muss WeightedLikert == Likert."""
         from iil_learnfw.services.assessment_scoring import LikertScoring, WeightedLikertScoring
 
-        qs = self._make_questions_with_weights([
-            ("dim1", Decimal("1.0")),
-            ("dim2", Decimal("1.0")),
-        ])
+        qs = self._make_questions_with_weights(
+            [
+                ("dim1", Decimal("1.0")),
+                ("dim2", Decimal("1.0")),
+            ]
+        )
         answers = {str(q.public_id): 3 for q in qs}
         maturity = [self._make_maturity(0, 100)]
 
-        likert_result   = LikertScoring().score(qs, answers, [], maturity, 1, 4)
+        likert_result = LikertScoring().score(qs, answers, [], maturity, 1, 4)
         weighted_result = WeightedLikertScoring().score(qs, answers, [], maturity, 1, 4)
 
         assert likert_result.total_pct == weighted_result.total_pct
@@ -473,10 +501,12 @@ class TestWeightedLikertScoring:
 
         # dim1 (weight=2.0) antwortet mit 4 (max)
         # dim2 (weight=1.0) antwortet mit 1 (min)
-        qs = self._make_questions_with_weights([
-            ("high_weight", Decimal("2.0")),
-            ("low_weight",  Decimal("1.0")),
-        ])
+        qs = self._make_questions_with_weights(
+            [
+                ("high_weight", Decimal("2.0")),
+                ("low_weight", Decimal("1.0")),
+            ]
+        )
         answers = {
             str(qs[0].public_id): 4,  # high_weight: max
             str(qs[1].public_id): 1,  # low_weight: min
@@ -487,24 +517,26 @@ class TestWeightedLikertScoring:
 
         # Ungewichtet: (100 + 0) / 2 = 50%
         # Gewichtet:   (100*2 + 0*1) / 3 ≈ 67%
-        assert result.total_pct > 50, \
-            f"WeightedLikert mit höherem Gewicht auf max-Dimension soll > 50% geben, bekam {result.total_pct}%"
+        assert result.total_pct > 50, f"WeightedLikert mit höherem Gewicht auf max-Dimension soll > 50% geben, bekam {result.total_pct}%"
 
 
 # ---------------------------------------------------------------------------
 # K-5: ScoringStrategy als ABC
 # ---------------------------------------------------------------------------
 
+
 class TestScoringStrategyABC:
     """K-5 Regression: ScoringStrategy ist ABC mit abstractmethod."""
 
     def test_cannot_instantiate_base_class(self):
         from iil_learnfw.services.assessment_scoring import ScoringStrategy
+
         with pytest.raises(TypeError):
             ScoringStrategy()
 
     def test_incomplete_subclass_raises_on_instantiation(self):
         from iil_learnfw.services.assessment_scoring import ScoringStrategy
+
         class IncompleteStrategy(ScoringStrategy):
             pass  # score() nicht implementiert
 
@@ -516,17 +548,19 @@ class TestScoringStrategyABC:
 # K-6: Maturity-Lookup über total_pct
 # ---------------------------------------------------------------------------
 
+
 class TestMaturityLookupOnPct:
     """K-6 Regression: Maturity-Lookup verwendet total_pct (0-100), nicht Rohscore."""
 
     def _make_maturity_levels(self):
         from unittest.mock import MagicMock
+
         levels = []
         for key, pct_min, pct_max in [
-            ("starter",  0,  24),
+            ("starter", 0, 24),
             ("entwickl", 25, 49),
-            ("fortgesch",50, 74),
-            ("reif",     75, 100),
+            ("fortgesch", 50, 74),
+            ("reif", 75, 100),
         ]:
             m = MagicMock()
             m.key = key
@@ -540,32 +574,27 @@ class TestMaturityLookupOnPct:
 
     def test_80pct_gives_reif(self):
         from iil_learnfw.services.assessment_scoring import LikertScoring
+
         q = unittest_mock_question()
         answers = {str(q.public_id): 4}  # max → 100%
 
-        result = LikertScoring().score(
-            questions=[q], answers=answers, dimensions=[],
-            maturity_levels=self._make_maturity_levels(), scale_min=1, scale_max=4
-        )
-        assert result.maturity_key == "reif", \
-            f"100% sollte 'reif' geben, bekam '{result.maturity_key}'"
+        result = LikertScoring().score(questions=[q], answers=answers, dimensions=[], maturity_levels=self._make_maturity_levels(), scale_min=1, scale_max=4)
+        assert result.maturity_key == "reif", f"100% sollte 'reif' geben, bekam '{result.maturity_key}'"
 
     def test_30pct_gives_entwicklung(self):
         from iil_learnfw.services.assessment_scoring import LikertScoring
+
         # scale 1-4, Antwort 2 → pct = (2-1)/(4-1)*100 ≈ 33%
         q = unittest_mock_question()
         answers = {str(q.public_id): 2}
 
-        result = LikertScoring().score(
-            questions=[q], answers=answers, dimensions=[],
-            maturity_levels=self._make_maturity_levels(), scale_min=1, scale_max=4
-        )
-        assert result.maturity_key == "entwickl", \
-            f"~33% sollte 'entwickl' geben, bekam '{result.maturity_key}'"
+        result = LikertScoring().score(questions=[q], answers=answers, dimensions=[], maturity_levels=self._make_maturity_levels(), scale_min=1, scale_max=4)
+        assert result.maturity_key == "entwickl", f"~33% sollte 'entwickl' geben, bekam '{result.maturity_key}'"
 
 
 def unittest_mock_question(dim_key="dim1"):
     from unittest.mock import MagicMock
+
     q = MagicMock()
     q.pk = 1
     q.public_id = uuid.uuid4()
@@ -579,6 +608,7 @@ def unittest_mock_question(dim_key="dim1"):
 # H-7: Maturity-Overlap-Validierung
 # ---------------------------------------------------------------------------
 
+
 class TestMaturityOverlapValidation:
     """H-7: Überlappende Maturity-Ranges werden erkannt."""
 
@@ -588,12 +618,17 @@ class TestMaturityOverlapValidation:
         from iil_learnfw.services.assessment_service import AssessmentService
 
         AssessmentMaturityLevel.objects.create(
-            assessment_type=assessment_type, tenant_id=tenant_id,
-            key="a", label="A", description="", color="#aaaaaa", pct_min=0, pct_max=50
+            assessment_type=assessment_type, tenant_id=tenant_id, key="a", label="A", description="", color="#aaaaaa", pct_min=0, pct_max=50
         )
         AssessmentMaturityLevel.objects.create(
-            assessment_type=assessment_type, tenant_id=tenant_id,
-            key="b", label="B", description="", color="#bbbbbb", pct_min=40, pct_max=100
+            assessment_type=assessment_type,
+            tenant_id=tenant_id,
+            key="b",
+            label="B",
+            description="",
+            color="#bbbbbb",
+            pct_min=40,
+            pct_max=100,
             # Überlappung 40-50 mit Level A
         )
         errors = AssessmentService.validate_maturity_ranges(
@@ -617,13 +652,12 @@ class TestMaturityOverlapValidation:
 # Service-Integrationstests
 # ---------------------------------------------------------------------------
 
+
 class TestAssessmentServiceIntegration:
     """Vollständiger Assessment-Durchlauf (start → submit → result)."""
 
     @pytest.mark.django_db(transaction=True)
-    def test_full_assessment_flow(
-        self, assessment_type, dimensions, questions, maturity_levels, tenant_id
-    ):
+    def test_full_assessment_flow(self, assessment_type, dimensions, questions, maturity_levels, tenant_id):
         from iil_learnfw.services.assessment_service import AssessmentService
 
         # Start
@@ -653,13 +687,12 @@ class TestAssessmentServiceIntegration:
         assert result_dict["has_report"] is True
 
     @pytest.mark.django_db
-    def test_submit_twice_raises(
-        self, assessment_type, dimensions, questions, maturity_levels, tenant_id
-    ):
+    def test_submit_twice_raises(self, assessment_type, dimensions, questions, maturity_levels, tenant_id):
         from iil_learnfw.services.assessment_service import (
             AssessmentService,
             AssessmentValidationError,
         )
+
         attempt = AssessmentService.start_attempt(
             assessment_type_slug=assessment_type.slug,
             tenant_id=tenant_id,

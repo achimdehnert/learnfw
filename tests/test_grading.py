@@ -8,6 +8,7 @@ class TestKeywordFallback:
 
     def setup_method(self):
         from iil_learnfw.grading.keyword import KeywordFallback
+
         self.grader = KeywordFallback()
 
     def test_should_score_100_when_all_keywords_present(self):
@@ -53,6 +54,7 @@ class TestLLMGrading:
 
     def test_should_fallback_to_keywords_when_no_api_key(self):
         from iil_learnfw.grading.llm import LLMGrading
+
         grader = LLMGrading(api_key="")
         questions = [{"question": "Test", "expected": "A", "keywords": ["key"]}]
         answers = ["key is present"]
@@ -62,6 +64,7 @@ class TestLLMGrading:
 
     def test_should_expose_grade_answers_convenience(self):
         from iil_learnfw.grading.llm import grade_answers
+
         questions = [{"question": "Test", "expected": "A", "keywords": ["key"]}]
         answers = ["key"]
         results = grade_answers(questions, answers)
@@ -78,6 +81,7 @@ class TestGradingImports:
             KeywordFallback,
             LLMGrading,
         )
+
         assert GradingBackend is not None
         assert GradingResult is not None
         assert KeywordFallback is not None
@@ -85,6 +89,7 @@ class TestGradingImports:
 
     def test_grading_result_is_frozen_dataclass(self):
         from iil_learnfw.grading import GradingResult
+
         r = GradingResult(score=85, feedback="Good")
         assert r.score == 85
         assert r.feedback == "Good"

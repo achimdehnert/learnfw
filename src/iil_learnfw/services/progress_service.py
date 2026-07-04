@@ -45,9 +45,7 @@ def get_course_progress(user, course_id: int) -> dict:
     """Calculate course completion percentage for a user."""
     from ..models.course import Lesson
 
-    total = Lesson.objects.filter(
-        chapter__course_id=course_id, is_mandatory=True
-    ).count()
+    total = Lesson.objects.filter(chapter__course_id=course_id, is_mandatory=True).count()
     if total == 0:
         return {"total": 0, "completed": 0, "percentage": 100}
 

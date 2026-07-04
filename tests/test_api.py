@@ -97,9 +97,7 @@ class TestCourseViewSet:
         assert "chapters" in response.data
 
     def test_should_enroll_in_course(self, factory, user, course):
-        request = _auth_request(
-            factory, user, "post", f"/api/courses/{course.pk}/enroll/"
-        )
+        request = _auth_request(factory, user, "post", f"/api/courses/{course.pk}/enroll/")
         view = CourseViewSet.as_view({"post": "enroll"})
         response = view(request, pk=course.pk)
         assert response.status_code == 201
@@ -107,9 +105,7 @@ class TestCourseViewSet:
 
     def test_should_withdraw_from_course(self, factory, user, course):
         Enrollment.objects.create(user=user, course=course, status="active")
-        request = _auth_request(
-            factory, user, "post", f"/api/courses/{course.pk}/withdraw/"
-        )
+        request = _auth_request(factory, user, "post", f"/api/courses/{course.pk}/withdraw/")
         view = CourseViewSet.as_view({"post": "withdraw"})
         response = view(request, pk=course.pk)
         assert response.status_code == 204

@@ -26,22 +26,16 @@ def enroll(user, course_id: int) -> Enrollment:
 
 def withdraw(user, course_id: int) -> None:
     """Withdraw a user from a course."""
-    Enrollment.objects.filter(user=user, course_id=course_id).update(
-        status="withdrawn"
-    )
+    Enrollment.objects.filter(user=user, course_id=course_id).update(status="withdrawn")
     logger.info("User %s withdrawn from course %d", user, course_id)
 
 
 def is_enrolled(user, course_id: int) -> bool:
     """Check if user is actively enrolled."""
-    return Enrollment.objects.filter(
-        user=user, course_id=course_id, status="active"
-    ).exists()
+    return Enrollment.objects.filter(user=user, course_id=course_id, status="active").exists()
 
 
 def complete_enrollment(user, course_id: int) -> None:
     """Mark enrollment as completed."""
-    Enrollment.objects.filter(user=user, course_id=course_id, status="active").update(
-        status="completed", completed_at=timezone.now()
-    )
+    Enrollment.objects.filter(user=user, course_id=course_id, status="active").update(status="completed", completed_at=timezone.now())
     logger.info("User %s completed course %d", user, course_id)

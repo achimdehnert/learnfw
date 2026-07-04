@@ -40,9 +40,7 @@ class CourseManager(models.Manager):
 
     def for_tenant(self, tenant_id):
         """Return courses visible to a tenant: own + global."""
-        return self.get_queryset().filter(
-            models.Q(tenant_id=tenant_id) | models.Q(is_global=True)
-        )
+        return self.get_queryset().filter(models.Q(tenant_id=tenant_id) | models.Q(is_global=True))
 
     def published(self):
         """Return only published courses."""
@@ -90,9 +88,7 @@ class Course(TenantMixin):
     title = models.CharField(max_length=300)
     slug = models.SlugField(max_length=300, unique=True)
     description = models.TextField(blank=True)
-    category = models.ForeignKey(
-        Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="courses"
-    )
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name="courses")
     cover_image = models.ImageField(upload_to=tenant_upload_path, blank=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="draft")
     is_global = models.BooleanField(
@@ -113,9 +109,7 @@ class Course(TenantMixin):
         related_name="authored_courses",
     )
     estimated_duration_minutes = models.PositiveIntegerField(default=0)
-    passing_score = models.PositiveIntegerField(
-        default=80, help_text="Minimum score (%) to pass."
-    )
+    passing_score = models.PositiveIntegerField(default=80, help_text="Minimum score (%) to pass.")
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -165,12 +159,8 @@ class Lesson(TenantMixin):
     chapter = models.ForeignKey(Chapter, on_delete=models.CASCADE, related_name="lessons")
     title = models.CharField(max_length=300)
     content_type = models.CharField(max_length=20, choices=CONTENT_TYPE_CHOICES, default="markdown")
-    content_text = models.TextField(
-        blank=True, help_text="Markdown content (when content_type=markdown)."
-    )
-    content_file = models.FileField(
-        upload_to=tenant_upload_path, blank=True, help_text="PDF or PPTX file."
-    )
+    content_text = models.TextField(blank=True, help_text="Markdown content (when content_type=markdown).")
+    content_file = models.FileField(upload_to=tenant_upload_path, blank=True, help_text="PDF or PPTX file.")
     external_url = models.URLField(blank=True)
     estimated_duration_minutes = models.PositiveIntegerField(default=5)
     ordering = models.PositiveIntegerField(default=0)
@@ -192,9 +182,7 @@ class Enrollment(TenantMixin):
         ("withdrawn", "Withdrawn"),
     ]
 
-    user = models.ForeignKey(
-        settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="learnfw_enrollments"
-    )
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name="learnfw_enrollments")
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name="enrollments")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="active")
     enrolled_at = models.DateTimeField(auto_now_add=True)

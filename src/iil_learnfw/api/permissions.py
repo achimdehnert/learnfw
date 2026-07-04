@@ -10,9 +10,7 @@ class IsEnrolled(BasePermission):
         from ..models.course import Enrollment
 
         course = getattr(obj, "course", obj)
-        return Enrollment.objects.filter(
-            user=request.user, course=course, status="active"
-        ).exists()
+        return Enrollment.objects.filter(user=request.user, course=course, status="active").exists()
 
 
 class IsAuthorOrReadOnly(BasePermission):

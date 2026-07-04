@@ -29,9 +29,7 @@ class UserProgress(TenantMixin):
         on_delete=models.CASCADE,
         related_name="user_progress",
     )
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="not_started"
-    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="not_started")
     started_at = models.DateTimeField(null=True, blank=True)
     completed_at = models.DateTimeField(null=True, blank=True)
     time_spent_seconds = models.PositiveIntegerField(default=0)

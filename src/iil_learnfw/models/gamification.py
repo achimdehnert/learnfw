@@ -25,9 +25,7 @@ class Badge(TenantMixin):
     slug = models.SlugField(max_length=200, unique=True)
     icon = models.CharField(max_length=100, blank=True)
     description = models.TextField(blank=True)
-    trigger = models.CharField(
-        max_length=20, choices=TRIGGER_CHOICES, default="custom"
-    )
+    trigger = models.CharField(max_length=20, choices=TRIGGER_CHOICES, default="custom")
     threshold = models.PositiveIntegerField(
         default=1,
         help_text="Threshold for auto-award (e.g. 5 courses, 100 points).",
@@ -49,9 +47,7 @@ class UserBadge(TenantMixin):
         on_delete=models.CASCADE,
         related_name="learnfw_badges",
     )
-    badge = models.ForeignKey(
-        Badge, on_delete=models.CASCADE, related_name="awards"
-    )
+    badge = models.ForeignKey(Badge, on_delete=models.CASCADE, related_name="awards")
     awarded_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -98,9 +94,7 @@ class PointsTransaction(TenantMixin):
     )
     points = models.IntegerField(help_text="Positive = award, negative = deduction.")
     reason = models.CharField(max_length=200)
-    source_type = models.CharField(
-        max_length=20, choices=SOURCE_CHOICES, default="manual"
-    )
+    source_type = models.CharField(max_length=20, choices=SOURCE_CHOICES, default="manual")
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:

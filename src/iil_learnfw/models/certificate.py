@@ -15,18 +15,12 @@ class CertificateTemplate(TenantMixin):
     """Template for generating PDF certificates."""
 
     name = models.CharField(max_length=200)
-    html_template = models.TextField(
-        help_text="HTML template for WeasyPrint rendering. "
-        "Available context: {{ user }}, {{ course }}, {{ issued_at }}."
-    )
-    logo = models.FileField(
-        upload_to=tenant_upload_path, blank=True
-    )
-    signature_image = models.FileField(
-        upload_to=tenant_upload_path, blank=True
-    )
+    html_template = models.TextField(help_text="HTML template for WeasyPrint rendering. Available context: {{ user }}, {{ course }}, {{ issued_at }}.")
+    logo = models.FileField(upload_to=tenant_upload_path, blank=True)
+    signature_image = models.FileField(upload_to=tenant_upload_path, blank=True)
     valid_for_days = models.PositiveIntegerField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         help_text="Certificate validity in days (NULL = no expiry).",
     )
     is_default = models.BooleanField(
@@ -64,12 +58,12 @@ class IssuedCertificate(TenantMixin):
     issued_at = models.DateTimeField(auto_now_add=True)
     expires_at = models.DateTimeField(null=True, blank=True)
     verification_token = models.UUIDField(
-        default=uuid.uuid4, unique=True, db_index=True,
+        default=uuid.uuid4,
+        unique=True,
+        db_index=True,
         help_text="Public verification token (non-PK UUID, ADR-022).",
     )
-    pdf_file = models.FileField(
-        upload_to=tenant_upload_path, blank=True
-    )
+    pdf_file = models.FileField(upload_to=tenant_upload_path, blank=True)
 
     class Meta:
         unique_together = [("user", "course")]
