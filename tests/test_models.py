@@ -24,9 +24,7 @@ class TestCourseModel:
         assert course.slug == "my-learning-course"
 
     def test_should_create_global_course(self):
-        course = Course.objects.create(
-            title="Global Course", slug="global", is_global=True
-        )
+        course = Course.objects.create(title="Global Course", slug="global", is_global=True)
         assert course.is_global is True
         assert course.tenant_id is None
 

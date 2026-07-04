@@ -69,9 +69,7 @@ class CourseViewSet(viewsets.ReadOnlyModelViewSet):
         return Response(data)
 
 
-class EnrollmentViewSet(
-    mixins.ListModelMixin, viewsets.GenericViewSet
-):
+class EnrollmentViewSet(mixins.ListModelMixin, viewsets.GenericViewSet):
     """List current user's enrollments."""
 
     serializer_class = EnrollmentSerializer
@@ -111,9 +109,7 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
     permission_classes = [IsAuthenticated]
 
 
-class AttemptViewSet(
-    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
-):
+class AttemptViewSet(mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet):
     """List and retrieve quiz attempts for current user."""
 
     serializer_class = AttemptSerializer
@@ -166,7 +162,11 @@ class MyPointsViewSet(viewsets.ViewSet):
             points = UserPoints.objects.get(user=request.user)
             return Response(UserPointsSerializer(points).data)
         except UserPoints.DoesNotExist:
-            return Response({
-                "total_points": 0, "current_streak": 0,
-                "longest_streak": 0, "last_activity_date": None,
-            })
+            return Response(
+                {
+                    "total_points": 0,
+                    "current_streak": 0,
+                    "longest_streak": 0,
+                    "last_activity_date": None,
+                }
+            )

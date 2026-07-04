@@ -18,10 +18,7 @@ class MarkdownBackend(AbstractContentBackend):
         try:
             import markdown
         except ImportError:
-            logger.warning(
-                "markdown package not installed. "
-                "Install with: pip install iil-learnfw[markdown]"
-            )
+            logger.warning("markdown package not installed. Install with: pip install iil-learnfw[markdown]")
             return lesson.content_text
 
         return markdown.markdown(

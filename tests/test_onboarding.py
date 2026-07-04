@@ -75,18 +75,14 @@ class TestOnboardingStep:
 @pytest.mark.django_db
 class TestUserOnboardingState:
     def test_should_create_state(self, user, flow, step):
-        state = UserOnboardingState.objects.create(
-            user=user, flow=flow, step=step, status="pending"
-        )
+        state = UserOnboardingState.objects.create(user=user, flow=flow, step=step, status="pending")
         assert state.pk is not None
         assert state.status == "pending"
 
     def test_should_complete_state(self, user, flow, step):
         from django.utils import timezone
 
-        state = UserOnboardingState.objects.create(
-            user=user, flow=flow, step=step, status="in_progress"
-        )
+        state = UserOnboardingState.objects.create(user=user, flow=flow, step=step, status="in_progress")
         state.status = "completed"
         state.completed_at = timezone.now()
         state.save()

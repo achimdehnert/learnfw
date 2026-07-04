@@ -44,9 +44,7 @@ def calculate_dimension_score(
         list of ScoreResult per dimension,
         sorted by raw_score ascending.
     """
-    buckets: dict[str, list[tuple[float, float]]] = (
-        defaultdict(list)
-    )
+    buckets: dict[str, list[tuple[float, float]]] = defaultdict(list)
     for r in responses:
         try:
             value = float(r["value"]) / 5.0

@@ -10,6 +10,7 @@ Korrekturen gegenüber ADR-142-PROPOSED:
   K-6  Maturity-Lookup über total_pct (0-100), nicht über Rohscore
   M-4  Registry als Klasse mit register()-Methode
 """
+
 from __future__ import annotations
 
 import dataclasses
@@ -26,29 +27,32 @@ logger = logging.getLogger(__name__)
 # Ergebnis-Dataclasses (frozen → threadsafe, hashable)
 # ---------------------------------------------------------------------------
 
+
 @dataclass(frozen=True)
 class DimensionResult:
     """Scoring-Ergebnis einer einzelnen Dimension."""
-    key:        str
-    label:      str
-    score:      Decimal           # Durchschnitt auf Skala [scale_min, scale_max]
-    pct:        int               # 0-100 normalisiert
-    weight:     Decimal           # Gewichtungsfaktor (für WeightedLikert relevant)
+
+    key: str
+    label: str
+    score: Decimal  # Durchschnitt auf Skala [scale_min, scale_max]
+    pct: int  # 0-100 normalisiert
+    weight: Decimal  # Gewichtungsfaktor (für WeightedLikert relevant)
 
 
 @dataclass(frozen=True)
 class AssessmentResult:
     """Vollständiges Scoring-Ergebnis eines Attempts."""
-    total_score:          Decimal              # Rohsumme aller Antworten
-    total_pct:            int                  # 0-100 normalisiert (Maturity-Lookup-Basis!)
-    maturity_key:         str
-    maturity_label:       str
-    maturity_color:       str
+
+    total_score: Decimal  # Rohsumme aller Antworten
+    total_pct: int  # 0-100 normalisiert (Maturity-Lookup-Basis!)
+    maturity_key: str
+    maturity_label: str
+    maturity_color: str
     maturity_description: str
-    dimensions:           list[DimensionResult]
-    weakest:              str                  # dimension.key
-    strongest:            str                  # dimension.key
-    recommendations:      list[dict[str, Any]] = field(default_factory=list)
+    dimensions: list[DimensionResult]
+    weakest: str  # dimension.key
+    strongest: str  # dimension.key
+    recommendations: list[dict[str, Any]] = field(default_factory=list)
     # Befüllt durch RecommendationService.get_recommendations()
 
 
@@ -56,26 +60,30 @@ class AssessmentResult:
 # Typing-Hilfsmittel für Scoring-Inputs
 # ---------------------------------------------------------------------------
 
+
 class _MaturityLevelProtocol:
     """Duck-typing für AssessmentMaturityLevel-Instanzen."""
-    key:         str
-    label:       str
-    color:       str
+
+    key: str
+    label: str
+    color: str
     description: str
-    pct_min:     int
-    pct_max:     int
+    pct_min: int
+    pct_max: int
 
 
 class _DimensionProtocol:
     """Duck-typing für AssessmentDimension-Instanzen."""
-    key:    str
-    label:  str
+
+    key: str
+    label: str
     weight: Decimal
 
 
 class _QuestionProtocol:
     """Duck-typing für AssessmentQuestion-Instanzen."""
-    pk:        int
+
+    pk: int
     public_id: object  # uuid.UUID
     dimension: _DimensionProtocol
 
@@ -83,6 +91,7 @@ class _QuestionProtocol:
 # ---------------------------------------------------------------------------
 # Basis-Strategie (ABC)
 # ---------------------------------------------------------------------------
+
 
 class ScoringStrategy(ABC):
     """
@@ -96,19 +105,19 @@ class ScoringStrategy(ABC):
     @abstractmethod
     def score(
         self,
-        questions:       list,               # list[AssessmentQuestion]
-        answers:         dict[str, Any],      # {str(question.public_id): snapshot_dict|raw_value}
-        dimensions:      list,               # list[AssessmentDimension]
-        maturity_levels: list,               # list[AssessmentMaturityLevel] — aufsteigend nach pct_min
-        scale_min:       int,
-        scale_max:       int,
-    ) -> AssessmentResult:
-        ...
+        questions: list,  # list[AssessmentQuestion]
+        answers: dict[str, Any],  # {str(question.public_id): snapshot_dict|raw_value}
+        dimensions: list,  # list[AssessmentDimension]
+        maturity_levels: list,  # list[AssessmentMaturityLevel] — aufsteigend nach pct_min
+        scale_min: int,
+        scale_max: int,
+    ) -> AssessmentResult: ...
 
 
 # ---------------------------------------------------------------------------
 # LikertScoring
 # ---------------------------------------------------------------------------
+
 
 class LikertScoring(ScoringStrategy):
     """
@@ -121,30 +130,28 @@ class LikertScoring(ScoringStrategy):
 
     def score(
         self,
-        questions:       list,
-        answers:         dict[str, Any],
-        dimensions:      list,
+        questions: list,
+        answers: dict[str, Any],
+        dimensions: list,
         maturity_levels: list,
-        scale_min:       int,
-        scale_max:       int,
+        scale_min: int,
+        scale_max: int,
     ) -> AssessmentResult:
         scale_range = scale_max - scale_min
         if scale_range <= 0:
-            raise ValueError(
-                f"Ungültige Skala: scale_min={scale_min} muss < scale_max={scale_max} sein."
-            )
+            raise ValueError(f"Ungültige Skala: scale_min={scale_min} muss < scale_max={scale_max} sein.")
 
         # Antworten aus Snapshot-Format extrahieren
         # Unterstützt sowohl Snapshot-Dict als auch rohen int-Wert (Rückwärtskompatibilität)
-        dim_values:   dict[str, list[int]]  = {}
-        dim_meta:     dict[str, dict]       = {}
+        dim_values: dict[str, list[int]] = {}
+        dim_meta: dict[str, dict] = {}
 
         for q in questions:
             dk = q.dimension.key
             if dk not in dim_values:
                 dim_values[dk] = []
                 dim_meta[dk] = {
-                    "label":  q.dimension.label,
+                    "label": q.dimension.label,
                     "weight": q.dimension.weight,
                 }
 
@@ -169,16 +176,14 @@ class LikertScoring(ScoringStrategy):
             dim_values[dk].append(clamped)
 
         # Rohsumme und max-möglicher Wert
-        all_values  = [v for vals in dim_values.values() for v in vals]
-        total_raw   = sum(all_values)
+        all_values = [v for vals in dim_values.values() for v in vals]
+        total_raw = sum(all_values)
         max_possible = len(all_values) * scale_max
         min_possible = len(all_values) * scale_min
 
         # K-6: total_pct normalisiert auf 0-100
         if max_possible > min_possible:
-            total_pct = round(
-                (total_raw - min_possible) / (max_possible - min_possible) * 100
-            )
+            total_pct = round((total_raw - min_possible) / (max_possible - min_possible) * 100)
         else:
             total_pct = 0
         total_pct = max(0, min(100, total_pct))
@@ -191,20 +196,22 @@ class LikertScoring(ScoringStrategy):
                 pct = 0
             else:
                 raw_avg = sum(vals) / len(vals)
-                avg     = Decimal(str(raw_avg)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+                avg = Decimal(str(raw_avg)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
                 # K-1: Normalisierung über gesamte Skala (nicht hardcodiert /3)
-                pct     = round((float(avg) - scale_min) / scale_range * 100)
-                pct     = max(0, min(100, pct))
+                pct = round((float(avg) - scale_min) / scale_range * 100)
+                pct = max(0, min(100, pct))
 
-            dim_results.append(DimensionResult(
-                key=dk,
-                label=dim_meta[dk]["label"],
-                score=avg,
-                pct=pct,
-                weight=dim_meta[dk]["weight"],
-            ))
+            dim_results.append(
+                DimensionResult(
+                    key=dk,
+                    label=dim_meta[dk]["label"],
+                    score=avg,
+                    pct=pct,
+                    weight=dim_meta[dk]["weight"],
+                )
+            )
 
-        weakest   = min(dim_results, key=lambda d: d.score).key if dim_results else ""
+        weakest = min(dim_results, key=lambda d: d.score).key if dim_results else ""
         strongest = max(dim_results, key=lambda d: d.score).key if dim_results else ""
 
         # K-6: Maturity-Lookup über total_pct
@@ -243,6 +250,7 @@ class LikertScoring(ScoringStrategy):
 # WeightedLikertScoring  (K-4: vollständig implementiert)
 # ---------------------------------------------------------------------------
 
+
 class WeightedLikertScoring(LikertScoring):
     """
     Likert-Skala mit gewichteten Dimensionen.
@@ -255,24 +263,22 @@ class WeightedLikertScoring(LikertScoring):
 
     def score(
         self,
-        questions:       list,
-        answers:         dict[str, Any],
-        dimensions:      list,
+        questions: list,
+        answers: dict[str, Any],
+        dimensions: list,
         maturity_levels: list,
-        scale_min:       int,
-        scale_max:       int,
+        scale_min: int,
+        scale_max: int,
     ) -> AssessmentResult:
         # Zunächst Standard-LikertScoring für Dimensions-Ergebnisse
-        base_result = super().score(
-            questions, answers, dimensions, maturity_levels, scale_min, scale_max
-        )
+        base_result = super().score(questions, answers, dimensions, maturity_levels, scale_min, scale_max)
 
         if not base_result.dimensions:
             return base_result
 
         # Gewichteten Gesamt-Prozentsatz neu berechnen
-        total_weight    = sum(float(d.weight) for d in base_result.dimensions)
-        weighted_sum    = sum(float(d.pct) * float(d.weight) for d in base_result.dimensions)
+        total_weight = sum(float(d.weight) for d in base_result.dimensions)
+        weighted_sum = sum(float(d.pct) * float(d.weight) for d in base_result.dimensions)
 
         if total_weight > 0:
             weighted_pct = round(weighted_sum / total_weight)
@@ -280,7 +286,7 @@ class WeightedLikertScoring(LikertScoring):
             weighted_pct = base_result.total_pct
 
         weighted_pct = max(0, min(100, weighted_pct))
-        maturity     = self._resolve_maturity(weighted_pct, maturity_levels)
+        maturity = self._resolve_maturity(weighted_pct, maturity_levels)
 
         # Ergebnis mit korrigiertem total_pct zurückgeben
         # (dataclass frozen=True → neues Objekt via replace-Pattern)
@@ -298,6 +304,7 @@ class WeightedLikertScoring(LikertScoring):
 # QuizScoring
 # ---------------------------------------------------------------------------
 
+
 class QuizScoring(ScoringStrategy):
     """
     Quiz-Scoring: Richtig/Falsch → Prozent.
@@ -308,26 +315,26 @@ class QuizScoring(ScoringStrategy):
 
     def score(
         self,
-        questions:       list,
-        answers:         dict[str, Any],
-        dimensions:      list,
+        questions: list,
+        answers: dict[str, Any],
+        dimensions: list,
         maturity_levels: list,
-        scale_min:       int,
-        scale_max:       int,
+        scale_min: int,
+        scale_max: int,
     ) -> AssessmentResult:
-        correct_count   = 0
-        total_count     = len(questions)
+        correct_count = 0
+        total_count = len(questions)
 
         for q in questions:
-            raw  = answers.get(str(q.public_id)) or answers.get(str(q.pk))
+            raw = answers.get(str(q.public_id)) or answers.get(str(q.pk))
             if raw is None:
                 continue
-            val  = raw.get("value", raw) if isinstance(raw, dict) else raw
+            val = raw.get("value", raw) if isinstance(raw, dict) else raw
             if getattr(q, "correct_answer", None) is not None and str(val) == str(q.correct_answer):
                 correct_count += 1
 
         total_pct = round(correct_count / total_count * 100) if total_count else 0
-        maturity  = LikertScoring._resolve_maturity(total_pct, maturity_levels)
+        maturity = LikertScoring._resolve_maturity(total_pct, maturity_levels)
 
         return AssessmentResult(
             total_score=Decimal(str(correct_count)),
@@ -346,6 +353,7 @@ class QuizScoring(ScoringStrategy):
 # SurveyScoring
 # ---------------------------------------------------------------------------
 
+
 class SurveyScoring(ScoringStrategy):
     """
     Umfrage: keine Bewertung, nur Antwort-Aggregation.
@@ -354,12 +362,12 @@ class SurveyScoring(ScoringStrategy):
 
     def score(
         self,
-        questions:       list,
-        answers:         dict[str, Any],
-        dimensions:      list,
+        questions: list,
+        answers: dict[str, Any],
+        dimensions: list,
         maturity_levels: list,
-        scale_min:       int,
-        scale_max:       int,
+        scale_min: int,
+        scale_max: int,
     ) -> AssessmentResult:
         return AssessmentResult(
             total_score=Decimal("0"),
@@ -377,6 +385,7 @@ class SurveyScoring(ScoringStrategy):
 # ---------------------------------------------------------------------------
 # Strategy-Registry  (M-4: als Klasse statt Modul-Level-Dict)
 # ---------------------------------------------------------------------------
+
 
 class ScoringStrategyRegistry:
     """
@@ -401,10 +410,7 @@ class ScoringStrategyRegistry:
         cls = self._strategies.get(key)
         if cls is None:
             available = ", ".join(self._strategies.keys())
-            raise ValueError(
-                f"Unbekannte Scoring-Strategie: '{key}'. "
-                f"Verfügbar: {available}"
-            )
+            raise ValueError(f"Unbekannte Scoring-Strategie: '{key}'. Verfügbar: {available}")
         return cls()
 
     def available(self) -> list[str]:
@@ -413,7 +419,7 @@ class ScoringStrategyRegistry:
 
 # Singleton-Registry
 scoring_registry = ScoringStrategyRegistry()
-scoring_registry.register("likert",           LikertScoring)
-scoring_registry.register("weighted_likert",  WeightedLikertScoring)
-scoring_registry.register("quiz",             QuizScoring)
-scoring_registry.register("survey",           SurveyScoring)
+scoring_registry.register("likert", LikertScoring)
+scoring_registry.register("weighted_likert", WeightedLikertScoring)
+scoring_registry.register("quiz", QuizScoring)
+scoring_registry.register("survey", SurveyScoring)

@@ -38,21 +38,33 @@ def quiz(course):
 @pytest.fixture
 def questions_with_answers(quiz):
     q1 = Question.objects.create(
-        quiz=quiz, question_type="single_choice",
-        text="What is 2+2?", points=10, ordering=0,
+        quiz=quiz,
+        question_type="single_choice",
+        text="What is 2+2?",
+        points=10,
+        ordering=0,
     )
     Answer.objects.create(question=q1, text="3", is_correct=False, ordering=0)
     correct_a1 = Answer.objects.create(
-        question=q1, text="4", is_correct=True, ordering=1,
+        question=q1,
+        text="4",
+        is_correct=True,
+        ordering=1,
     )
 
     q2 = Question.objects.create(
-        quiz=quiz, question_type="single_choice",
-        text="Capital of Germany?", points=10, ordering=1,
+        quiz=quiz,
+        question_type="single_choice",
+        text="Capital of Germany?",
+        points=10,
+        ordering=1,
     )
     Answer.objects.create(question=q2, text="Munich", is_correct=False, ordering=0)
     correct_a2 = Answer.objects.create(
-        question=q2, text="Berlin", is_correct=True, ordering=1,
+        question=q2,
+        text="Berlin",
+        is_correct=True,
+        ordering=1,
     )
     return [(q1, correct_a1), (q2, correct_a2)]
 

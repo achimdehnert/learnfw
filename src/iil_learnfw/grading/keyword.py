@@ -23,21 +23,22 @@ class KeywordFallback(GradingBackend):
         for q, a in zip(questions, answers):
             a_lower = a.lower().strip()
             if not a_lower:
-                results.append(GradingResult(
-                    score=0,
-                    feedback="Keine Antwort eingegeben.",
-                ))
+                results.append(
+                    GradingResult(
+                        score=0,
+                        feedback="Keine Antwort eingegeben.",
+                    )
+                )
                 continue
 
             kw = q.get("keywords", [])
             if not kw:
-                results.append(GradingResult(
-                    score=50,
-                    feedback=(
-                        "Antwort erhalten \u2014 "
-                        "automatische Bewertung nicht m\u00f6glich."
-                    ),
-                ))
+                results.append(
+                    GradingResult(
+                        score=50,
+                        feedback=("Antwort erhalten \u2014 automatische Bewertung nicht m\u00f6glich."),
+                    )
+                )
                 continue
 
             hits = sum(1 for k in kw if k.lower() in a_lower)
@@ -46,14 +47,8 @@ class KeywordFallback(GradingBackend):
             if pct >= 80:
                 fb = "Sehr gut \u2014 alle Kernpunkte genannt!"
             elif pct >= 50:
-                fb = (
-                    "Teilweise richtig. "
-                    f"Musterantwort: {q['expected']}"
-                )
+                fb = f"Teilweise richtig. Musterantwort: {q['expected']}"
             else:
-                fb = (
-                    "Leider nicht korrekt. "
-                    f"Richtige Antwort: {q['expected']}"
-                )
+                fb = f"Leider nicht korrekt. Richtige Antwort: {q['expected']}"
             results.append(GradingResult(score=pct, feedback=fb))
         return results

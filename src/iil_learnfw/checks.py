@@ -10,6 +10,7 @@ Registriert:
   E002  ASSESSMENT_ENGINE_ENABLED aber WeasyPrint nicht installiert
   E003  Scoring-Strategie-Wert in AssessmentType ungültig (optional, via DB-Check)
 """
+
 from __future__ import annotations
 
 import logging
@@ -22,12 +23,14 @@ logger = logging.getLogger(__name__)
 def _get_learnfw_setting(key: str, default=None):
     """Liest aus IIL_LEARNFW-Dict in settings."""
     from django.conf import settings  # noqa: PLC0415
+
     return getattr(settings, "IIL_LEARNFW", {}).get(key, default)
 
 
 # ---------------------------------------------------------------------------
 # E001 / W001: ASSESSMENT_IP_HASH_SALT
 # ---------------------------------------------------------------------------
+
 
 @register(deploy=True)
 def check_assessment_ip_hash_salt_deploy(app_configs, **kwargs):
@@ -38,15 +41,17 @@ def check_assessment_ip_hash_salt_deploy(app_configs, **kwargs):
     errors = []
     salt = _get_learnfw_setting("ASSESSMENT_IP_HASH_SALT", "")
     if not salt:
-        errors.append(Error(
-            "IIL_LEARNFW['ASSESSMENT_IP_HASH_SALT'] ist nicht konfiguriert.",
-            hint=(
-                "Setze IIL_LEARNFW['ASSESSMENT_IP_HASH_SALT'] auf einen "
-                "sicheren zufälligen Wert (min. 32 Zeichen) in den Settings. "
-                "Beispiel: python -c \"import secrets; print(secrets.token_hex(32))\""
-            ),
-            id="iil_learnfw.E001",
-        ))
+        errors.append(
+            Error(
+                "IIL_LEARNFW['ASSESSMENT_IP_HASH_SALT'] ist nicht konfiguriert.",
+                hint=(
+                    "Setze IIL_LEARNFW['ASSESSMENT_IP_HASH_SALT'] auf einen "
+                    "sicheren zufälligen Wert (min. 32 Zeichen) in den Settings. "
+                    'Beispiel: python -c "import secrets; print(secrets.token_hex(32))"'
+                ),
+                id="iil_learnfw.E001",
+            )
+        )
     return errors
 
 
@@ -58,20 +63,20 @@ def check_assessment_ip_hash_salt_dev(app_configs, **kwargs):
     warnings = []
     salt = _get_learnfw_setting("ASSESSMENT_IP_HASH_SALT", "")
     if not salt:
-        warnings.append(Warning(
-            "IIL_LEARNFW['ASSESSMENT_IP_HASH_SALT'] ist nicht konfiguriert.",
-            hint=(
-                "In Produktion wird dies zu einem Error (E001). "
-                "Für Development genügt ein beliebiger String."
-            ),
-            id="iil_learnfw.W001",
-        ))
+        warnings.append(
+            Warning(
+                "IIL_LEARNFW['ASSESSMENT_IP_HASH_SALT'] ist nicht konfiguriert.",
+                hint=("In Produktion wird dies zu einem Error (E001). Für Development genügt ein beliebiger String."),
+                id="iil_learnfw.W001",
+            )
+        )
     return warnings
 
 
 # ---------------------------------------------------------------------------
 # E002: WeasyPrint-Check wenn Report-Engine konfiguriert
 # ---------------------------------------------------------------------------
+
 
 @register(deploy=True)
 def check_assessment_report_engine(app_configs, **kwargs):
@@ -84,18 +89,20 @@ def check_assessment_report_engine(app_configs, **kwargs):
         try:
             import weasyprint  # noqa: F401
         except ImportError:
-            errors.append(Error(
-                "IIL_LEARNFW['ASSESSMENT_REPORT_ENGINE']='weasyprint', "
-                "aber weasyprint ist nicht installiert.",
-                hint="pip install weasyprint — oder setze ASSESSMENT_REPORT_ENGINE='none'.",
-                id="iil_learnfw.E002",
-            ))
+            errors.append(
+                Error(
+                    "IIL_LEARNFW['ASSESSMENT_REPORT_ENGINE']='weasyprint', aber weasyprint ist nicht installiert.",
+                    hint="pip install weasyprint — oder setze ASSESSMENT_REPORT_ENGINE='none'.",
+                    id="iil_learnfw.E002",
+                )
+            )
     return errors
 
 
 # ---------------------------------------------------------------------------
 # W002: ASSESSMENT_LEAD_CAPTURE ohne E-Mail-Backend
 # ---------------------------------------------------------------------------
+
 
 @register(deploy=True)
 def check_assessment_lead_capture(app_configs, **kwargs):
@@ -106,12 +113,14 @@ def check_assessment_lead_capture(app_configs, **kwargs):
     lead_capture = _get_learnfw_setting("ASSESSMENT_LEAD_CAPTURE", False)
     if lead_capture:
         from django.conf import settings  # noqa: PLC0415
+
         backend = getattr(settings, "EMAIL_BACKEND", "")
         if "console" in backend or "dummy" in backend or "locmem" in backend:
-            warnings.append(Warning(
-                f"ASSESSMENT_LEAD_CAPTURE=True, aber EMAIL_BACKEND='{backend}' "
-                "sendet keine echten E-Mails.",
-                hint="Setze EMAIL_BACKEND auf einen SMTP- oder SES-Backend in Produktion.",
-                id="iil_learnfw.W002",
-            ))
+            warnings.append(
+                Warning(
+                    f"ASSESSMENT_LEAD_CAPTURE=True, aber EMAIL_BACKEND='{backend}' sendet keine echten E-Mails.",
+                    hint="Setze EMAIL_BACKEND auf einen SMTP- oder SES-Backend in Produktion.",
+                    id="iil_learnfw.W002",
+                )
+            )
     return warnings

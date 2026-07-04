@@ -20,8 +20,13 @@ class LessonSerializer(serializers.ModelSerializer):
     class Meta:
         model = Lesson
         fields = [
-            "id", "chapter", "title", "content_type",
-            "estimated_duration_minutes", "ordering", "is_mandatory",
+            "id",
+            "chapter",
+            "title",
+            "content_type",
+            "estimated_duration_minutes",
+            "ordering",
+            "is_mandatory",
         ]
         read_only_fields = ["id"]
 
@@ -41,9 +46,16 @@ class CourseListSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            "id", "title", "slug", "description", "status",
-            "category", "category_name", "is_global",
-            "estimated_duration_minutes", "created_at",
+            "id",
+            "title",
+            "slug",
+            "description",
+            "status",
+            "category",
+            "category_name",
+            "is_global",
+            "estimated_duration_minutes",
+            "created_at",
         ]
         read_only_fields = ["id", "created_at"]
 
@@ -55,11 +67,21 @@ class CourseDetailSerializer(serializers.ModelSerializer):
     class Meta:
         model = Course
         fields = [
-            "id", "title", "slug", "description", "status",
-            "category", "category_name", "is_global",
-            "marketplace_enabled", "module_code",
-            "estimated_duration_minutes", "passing_score",
-            "created_at", "updated_at", "chapters",
+            "id",
+            "title",
+            "slug",
+            "description",
+            "status",
+            "category",
+            "category_name",
+            "is_global",
+            "marketplace_enabled",
+            "module_code",
+            "estimated_duration_minutes",
+            "passing_score",
+            "created_at",
+            "updated_at",
+            "chapters",
         ]
         read_only_fields = ["id", "created_at", "updated_at"]
 
@@ -70,8 +92,13 @@ class EnrollmentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Enrollment
         fields = [
-            "id", "user", "course", "course_title",
-            "status", "enrolled_at", "completed_at",
+            "id",
+            "user",
+            "course",
+            "course_title",
+            "status",
+            "enrolled_at",
+            "completed_at",
         ]
         read_only_fields = ["id", "user", "enrolled_at", "completed_at"]
 
@@ -82,8 +109,14 @@ class UserProgressSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProgress
         fields = [
-            "id", "user", "lesson", "lesson_title",
-            "status", "started_at", "completed_at", "time_spent_seconds",
+            "id",
+            "user",
+            "lesson",
+            "lesson_title",
+            "status",
+            "started_at",
+            "completed_at",
+            "time_spent_seconds",
         ]
         read_only_fields = ["id", "user", "started_at", "completed_at"]
 
@@ -101,8 +134,13 @@ class QuestionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Question
         fields = [
-            "id", "quiz", "question_type", "text",
-            "points", "ordering", "answers",
+            "id",
+            "quiz",
+            "question_type",
+            "text",
+            "points",
+            "ordering",
+            "answers",
         ]
         read_only_fields = ["id"]
 
@@ -113,9 +151,15 @@ class QuizSerializer(serializers.ModelSerializer):
     class Meta:
         model = Quiz
         fields = [
-            "id", "course", "chapter", "title",
-            "passing_score", "max_attempts", "time_limit_minutes",
-            "shuffle_questions", "question_count",
+            "id",
+            "course",
+            "chapter",
+            "title",
+            "passing_score",
+            "max_attempts",
+            "time_limit_minutes",
+            "shuffle_questions",
+            "question_count",
         ]
         read_only_fields = ["id"]
 
@@ -126,8 +170,14 @@ class AttemptSerializer(serializers.ModelSerializer):
     class Meta:
         model = Attempt
         fields = [
-            "id", "user", "quiz", "quiz_title",
-            "started_at", "completed_at", "score", "passed",
+            "id",
+            "user",
+            "quiz",
+            "quiz_title",
+            "started_at",
+            "completed_at",
+            "score",
+            "passed",
         ]
         read_only_fields = ["id", "user", "started_at", "completed_at", "score", "passed"]
 
@@ -138,8 +188,13 @@ class IssuedCertificateSerializer(serializers.ModelSerializer):
     class Meta:
         model = IssuedCertificate
         fields = [
-            "id", "user", "course", "course_title",
-            "issued_at", "expires_at", "verification_token",
+            "id",
+            "user",
+            "course",
+            "course_title",
+            "issued_at",
+            "expires_at",
+            "verification_token",
         ]
         read_only_fields = ["id", "user", "issued_at", "verification_token"]
 

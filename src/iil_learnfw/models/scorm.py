@@ -29,9 +29,7 @@ class ScormPackage(TenantMixin):
         on_delete=models.CASCADE,
         related_name="scorm_packages",
     )
-    scorm_version = models.CharField(
-        max_length=4, choices=VERSION_CHOICES, default="1.2"
-    )
+    scorm_version = models.CharField(max_length=4, choices=VERSION_CHOICES, default="1.2")
     package_file = models.FileField(upload_to=scorm_upload_path)
     manifest = models.JSONField(
         default=dict,
@@ -73,14 +71,13 @@ class ScormTracking(TenantMixin):
         on_delete=models.CASCADE,
         related_name="tracking_entries",
     )
-    status = models.CharField(
-        max_length=20, choices=STATUS_CHOICES, default="not_attempted"
-    )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="not_attempted")
     score_raw = models.FloatField(null=True, blank=True)
     score_min = models.FloatField(default=0)
     score_max = models.FloatField(default=100)
     total_time = models.DurationField(
-        null=True, blank=True,
+        null=True,
+        blank=True,
         help_text="Total time spent in SCORM session.",
     )
     suspend_data = models.TextField(

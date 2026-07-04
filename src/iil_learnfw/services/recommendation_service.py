@@ -9,6 +9,7 @@ Korrekturen gegenüber ADR-142-PROPOSED:
        Threshold-Vergleich auf pct-Basis (konsistent mit K-6 / threshold_below_pct).
   NEU-K1  tenant_id ist uuid.UUID (nicht int) — konsistent mit TenantMixin
 """
+
 from __future__ import annotations
 
 import logging
@@ -32,8 +33,8 @@ class RecommendationService:
     @staticmethod
     def get_recommendations(
         *,
-        assessment_type,                      # AssessmentType-Instanz
-        tenant_id:         uuid_mod.UUID | None,  # K-2: obligatorisch, kein Default
+        assessment_type,  # AssessmentType-Instanz
+        tenant_id: uuid_mod.UUID | None,  # K-2: obligatorisch, kein Default
         dimension_results: list[DimensionResult],
     ) -> list[dict[str, Any]]:
         """
@@ -50,10 +51,9 @@ class RecommendationService:
         # Einmaliger DB-Fetch aller Empfehlungen für diesen Assessment-Typ + Tenant
         # (besser als N Queries in einer Schleife)
         all_recs = (
-            AssessmentRecommendation.objects
-            .filter(
+            AssessmentRecommendation.objects.filter(
                 dimension__assessment_type=assessment_type,
-                tenant_id=tenant_id,              # K-2: Tenant-Isolation
+                tenant_id=tenant_id,  # K-2: Tenant-Isolation
                 deleted_at__isnull=True,
             )
             .select_related("dimension", "course", "lesson")
@@ -74,34 +74,38 @@ class RecommendationService:
                 # K-2/K-6: Vergleich auf pct-Basis (threshold_below_pct ist 0-100)
                 if dim_result.pct < rec.threshold_below_pct:
                     gap_pct = rec.threshold_below_pct - dim_result.pct
-                    recommendations.append({
-                        "dimension_key":    dim_result.key,
-                        "dimension_label":  dim_result.label,
-                        "dimension_pct":    dim_result.pct,
-                        "gap_pct":          gap_pct,
-                        "title":            rec.title,
-                        "description":      rec.description,
-                        "priority":         rec.priority,
-                        "course_id":        str(rec.course.public_id) if rec.course else None,
-                        "course_title":     rec.course.title if rec.course else None,
-                        "lesson_id":        str(rec.lesson.public_id) if rec.lesson else None,
-                        "lesson_title":     rec.lesson.title if rec.lesson else None,
-                        "external_url":     rec.external_url,
-                    })
+                    recommendations.append(
+                        {
+                            "dimension_key": dim_result.key,
+                            "dimension_label": dim_result.label,
+                            "dimension_pct": dim_result.pct,
+                            "gap_pct": gap_pct,
+                            "title": rec.title,
+                            "description": rec.description,
+                            "priority": rec.priority,
+                            "course_id": str(rec.course.public_id) if rec.course else None,
+                            "course_title": rec.course.title if rec.course else None,
+                            "lesson_id": str(rec.lesson.public_id) if rec.lesson else None,
+                            "lesson_title": rec.lesson.title if rec.lesson else None,
+                            "external_url": rec.external_url,
+                        }
+                    )
 
         # Sortierung: höchste Dringlichkeit (gap_pct desc) → niedrigste Prioritätsnummer
         recommendations.sort(key=lambda r: (-r["gap_pct"], r["priority"]))
 
         logger.debug(
             "RecommendationService: %d Empfehlungen für Tenant %s, Assessment '%s'",
-            len(recommendations), tenant_id, assessment_type.key,
+            len(recommendations),
+            tenant_id,
+            assessment_type.key,
         )
         return recommendations
 
     @staticmethod
     def get_recommendations_for_report(
         *,
-        attempt,    # AssessmentAttempt — bereits completed
+        attempt,  # AssessmentAttempt — bereits completed
         tenant_id: uuid_mod.UUID | None,
         max_count: int = 10,
     ) -> list[dict[str, Any]]:

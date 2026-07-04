@@ -23,13 +23,22 @@ def course_with_lessons():
     course = Course.objects.create(title="Progress Course", slug="prog-c1")
     chapter = Chapter.objects.create(course=course, title="Ch1")
     l1 = Lesson.objects.create(
-        chapter=chapter, title="Lesson 1", ordering=0, is_mandatory=True,
+        chapter=chapter,
+        title="Lesson 1",
+        ordering=0,
+        is_mandatory=True,
     )
     l2 = Lesson.objects.create(
-        chapter=chapter, title="Lesson 2", ordering=1, is_mandatory=True,
+        chapter=chapter,
+        title="Lesson 2",
+        ordering=1,
+        is_mandatory=True,
     )
     l3 = Lesson.objects.create(
-        chapter=chapter, title="Bonus", ordering=2, is_mandatory=False,
+        chapter=chapter,
+        title="Bonus",
+        ordering=2,
+        is_mandatory=False,
     )
     return course, [l1, l2, l3]
 
@@ -41,7 +50,9 @@ class TestProgressModel:
     def test_should_create_progress(self, user, course_with_lessons):
         _, lessons = course_with_lessons
         progress = UserProgress.objects.create(
-            user=user, lesson=lessons[0], status="not_started",
+            user=user,
+            lesson=lessons[0],
+            status="not_started",
         )
         assert progress.pk is not None
         assert progress.completed_at is None

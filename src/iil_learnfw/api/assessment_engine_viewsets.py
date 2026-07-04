@@ -13,6 +13,7 @@ NEU-K4: `platform_context` existiert nicht als Python-Package.
         _get_tenant_id() muss von jedem Konsumenten überschrieben werden
         (z.B. via Middleware, Subdomain, oder Settings).
 """
+
 from __future__ import annotations
 
 import logging
@@ -55,9 +56,11 @@ def _get_tenant_id(request):
         return request.tenant.id
     # Fallback: Platform-Standard-Tenant aus Settings
     from django.conf import settings as django_settings
+
     default_tid = getattr(django_settings, "IIL_LEARNFW", {}).get("DEFAULT_TENANT_ID")
     if default_tid:
         import uuid
+
         return uuid.UUID(str(default_tid)) if not isinstance(default_tid, uuid.UUID) else default_tid
     return None
 
@@ -70,14 +73,14 @@ class AssessmentTypeViewSet(ReadOnlyModelViewSet):
     GET /api/assessments/types/<slug>/
     GET /api/assessments/types/<slug>/questions/
     """
+
     lookup_field = "slug"
     permission_classes = [AllowAny]  # Öffentliche Liste — Tenant-Filter reicht
 
     def get_queryset(self):
         tenant_id = _get_tenant_id(self.request)
         return (
-            AssessmentType.objects
-            .filter(
+            AssessmentType.objects.filter(
                 tenant_id=tenant_id,
                 is_active=True,
                 deleted_at__isnull=True,
@@ -101,11 +104,10 @@ class AssessmentTypeViewSet(ReadOnlyModelViewSet):
         from iil_learnfw.models.assessment_engine import AssessmentQuestion  # noqa
 
         assessment_type = self.get_object()
-        tenant_id       = _get_tenant_id(request)
+        tenant_id = _get_tenant_id(request)
 
         questions = (
-            AssessmentQuestion.objects
-            .filter(
+            AssessmentQuestion.objects.filter(
                 dimension__assessment_type=assessment_type,
                 tenant_id=tenant_id,
                 deleted_at__isnull=True,
@@ -126,7 +128,8 @@ class AssessmentAttemptViewSet(GenericViewSet):
     POST /api/assessments/attempts/<public_id>/submit/
     GET  /api/assessments/attempts/<public_id>/result/
     """
-    lookup_field   = "public_id"
+
+    lookup_field = "public_id"
     lookup_value_regex = r"[0-9a-f-]{36}"
 
     def get_queryset(self):
@@ -154,9 +157,9 @@ class AssessmentAttemptViewSet(GenericViewSet):
 
         Startet einen neuen Attempt. Gibt public_id zurück.
         """
-        tenant_id  = _get_tenant_id(request)
+        tenant_id = _get_tenant_id(request)
         ip_address = request.META.get("REMOTE_ADDR", "")
-        user       = request.user if request.user.is_authenticated else None
+        user = request.user if request.user.is_authenticated else None
 
         try:
             attempt = AssessmentService.start_attempt(
@@ -171,8 +174,8 @@ class AssessmentAttemptViewSet(GenericViewSet):
         return Response(
             {
                 "attempt_public_id": str(attempt.public_id),
-                "assessment_type":   type_slug,
-                "started_at":        attempt.started_at.isoformat(),
+                "assessment_type": type_slug,
+                "started_at": attempt.started_at.isoformat(),
             },
             status=status.HTTP_201_CREATED,
         )
@@ -184,7 +187,7 @@ class AssessmentAttemptViewSet(GenericViewSet):
 
         Body: {"answers": {"<question_public_id>": <int_value>, ...}}
         """
-        tenant_id  = _get_tenant_id(request)
+        tenant_id = _get_tenant_id(request)
         serializer = AssessmentSubmitSerializer(data=request.data)
 
         if not serializer.is_valid():
@@ -231,12 +234,14 @@ class AssessmentReportViewSet(RetrieveModelMixin, GenericViewSet):
     GET  /api/assessments/reports/<public_id>/
     GET  /api/assessments/reports/<public_id>/download_pdf/
     """
-    lookup_field       = "public_id"
+
+    lookup_field = "public_id"
     lookup_value_regex = r"[0-9a-f-]{36}"
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         from iil_learnfw.models.assessment_engine import AssessmentReport  # noqa
+
         tenant_id = _get_tenant_id(self.request)
         return AssessmentReport.objects.filter(
             tenant_id=tenant_id,
@@ -245,6 +250,7 @@ class AssessmentReportViewSet(RetrieveModelMixin, GenericViewSet):
 
     def get_serializer_class(self):
         from iil_learnfw.api.serializers.assessment_engine import AssessmentAttemptResultSerializer  # noqa
+
         return AssessmentAttemptResultSerializer
 
     @action(detail=True, methods=["get"], url_path="download_pdf")
@@ -266,6 +272,7 @@ class AssessmentReportViewSet(RetrieveModelMixin, GenericViewSet):
             if engine == "weasyprint":
                 # Generierung on-demand (synchron für API, Celery-Task für async)
                 from iil_learnfw.reports.weasyprint_report import generate_pdf  # noqa
+
                 tenant_id = _get_tenant_id(request)
                 generate_pdf(report=report, tenant_id=tenant_id)
                 report.refresh_from_db()

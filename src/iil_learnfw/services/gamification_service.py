@@ -12,7 +12,10 @@ logger = logging.getLogger(__name__)
 
 
 def award_points(
-    user, points: int, reason: str, source_type: str = "manual",
+    user,
+    points: int,
+    reason: str,
+    source_type: str = "manual",
     tenant_id=None,
 ) -> PointsTransaction:
     """Award points to a user and update streak."""
@@ -24,9 +27,7 @@ def award_points(
         tenant_id=tenant_id,
     )
 
-    user_points, _ = UserPoints.objects.get_or_create(
-        user=user, defaults={"tenant_id": tenant_id}
-    )
+    user_points, _ = UserPoints.objects.get_or_create(user=user, defaults={"tenant_id": tenant_id})
     user_points.total_points = max(0, user_points.total_points + points)
 
     today = date.today()
@@ -41,15 +42,16 @@ def award_points(
     else:
         user_points.current_streak = 1
 
-    user_points.longest_streak = max(
-        user_points.longest_streak, user_points.current_streak
-    )
+    user_points.longest_streak = max(user_points.longest_streak, user_points.current_streak)
     user_points.last_activity_date = today
     user_points.save()
 
     logger.info(
         "User %s awarded %+d pts (%s), total=%d, streak=%d",
-        user, points, reason, user_points.total_points,
+        user,
+        points,
+        reason,
+        user_points.total_points,
         user_points.current_streak,
     )
     return tx
@@ -79,7 +81,9 @@ def check_and_award_badges(user, tenant_id=None) -> list[UserBadge]:
 
         if earned:
             ub = UserBadge.objects.create(
-                user=user, badge=badge, tenant_id=tenant_id,
+                user=user,
+                badge=badge,
+                tenant_id=tenant_id,
             )
             awarded.append(ub)
             logger.info("Badge '%s' awarded to %s", badge.name, user)

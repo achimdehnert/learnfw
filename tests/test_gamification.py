@@ -66,9 +66,7 @@ class TestUserPointsModel:
         assert up.current_streak == 0
 
     def test_should_str(self, user):
-        up = UserPoints.objects.create(
-            user=user, total_points=42, current_streak=3
-        )
+        up = UserPoints.objects.create(user=user, total_points=42, current_streak=3)
         assert "42pts" in str(up)
         assert "streak 3d" in str(up)
 
@@ -116,9 +114,7 @@ class TestCheckAndAwardBadges:
         assert len(awarded) == 0
 
     def test_should_award_streak_badge(self, user, streak_badge):
-        UserPoints.objects.create(
-            user=user, total_points=0, current_streak=5, longest_streak=5
-        )
+        UserPoints.objects.create(user=user, total_points=0, current_streak=5, longest_streak=5)
         awarded = check_and_award_badges(user)
         assert len(awarded) == 1
         assert awarded[0].badge == streak_badge

@@ -39,11 +39,7 @@ def _build_user_prompt(
 ) -> str:
     parts = []
     for i, (q, a) in enumerate(zip(questions, answers), 1):
-        parts.append(
-            f"Frage {i}: {q['question']}\n"
-            f"Musterantwort: {q['expected']}\n"
-            f"Teilnehmer-Antwort: {a}\n"
-        )
+        parts.append(f"Frage {i}: {q['question']}\nMusterantwort: {q['expected']}\nTeilnehmer-Antwort: {a}\n")
     return "\n".join(parts)
 
 
@@ -102,10 +98,7 @@ class LLMGrading(GradingBackend):
         try:
             import httpx
         except ImportError:
-            logger.warning(
-                "httpx not installed. Install with: "
-                "pip install 'iil-learnfw[grading]'"
-            )
+            logger.warning("httpx not installed. Install with: pip install 'iil-learnfw[grading]'")
             return self._fallback.grade(questions, answers)
 
         try:
@@ -135,8 +128,7 @@ class LLMGrading(GradingBackend):
                 content = content.rsplit("```", 1)[0]
 
             raw_results = json.loads(content)
-            if (isinstance(raw_results, list)
-                    and len(raw_results) == len(questions)):
+            if isinstance(raw_results, list) and len(raw_results) == len(questions):
                 return [
                     GradingResult(
                         score=max(0, min(100, int(r.get("score", 0)))),
