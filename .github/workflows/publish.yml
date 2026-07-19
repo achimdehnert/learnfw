@@ -76,6 +76,13 @@ jobs:
     name: Publish to PyPI
     needs: build
     runs-on: ubuntu-latest
+    # ADR-278: OIDC Trusted Publishing braucht id-token:write; environment pypi
+    # passend zur Trusted-Publisher-Bindung (repo=learnfw, publish.yml, env=pypi).
+    permissions:
+      id-token: write
+    environment:
+      name: pypi
+      url: https://pypi.org/project/iil-learnfw/
     if: |
       (github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')) ||
       (github.event_name == 'workflow_dispatch' && github.event.inputs.target == 'pypi')
