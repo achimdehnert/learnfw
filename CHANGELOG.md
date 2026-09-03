@@ -9,7 +9,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 - **Lektionsseite** `views.lesson_detail` + `iil_learnfw:lesson-detail` (`<slug>/lektion/<pk>/`): Markdown gerendert (`render_markdown`, Extra `[markdown]`, sonst escaped Absätze), PDF/PPTX/externe Lektionen als Schaltfläche in neuem Tab, Vor/Zurück in Leserichtung über Kapitelgrenzen, Position „Lektion n von N". Vorher war ein Kurs ein Inhaltsverzeichnis: `content_text`, `content_file`, `external_url` wurden gespeichert und nie gezeigt (writing-hub#994 K4).
-- `course_detail.html`: jede Lektion verlinkt ihre Seite.
+- `course_detail.html`: jede Lektion verlinkt ihre Seite; Kurs- und Kapitelbeschreibung werden als Markdown gerendert (`render_markdown`, Roh-HTML bleibt draußen).
 - Tests laufen jetzt auch gegen die Views (`tests/urls.py`, `ROOT_URLCONF`, `TEMPLATES` in den Test-Settings).
 
 ---
