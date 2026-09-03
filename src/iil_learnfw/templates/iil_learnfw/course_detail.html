@@ -121,8 +121,8 @@
     </div>
     <div class="header">
         <h1>{{ course.title }}</h1>
-        {% if course.description %}
-        <p class="description">{{ course.description }}</p>
+        {% if beschreibung_html %}
+        <div class="description inhalt" data-testid="kurs-beschreibung">{{ beschreibung_html }}</div>
         {% endif %}
         <div class="meta">
             {% if course.category %}
@@ -139,8 +139,8 @@
             {% for chapter in chapters %}
             <div class="chapter">
                 <h2 class="chapter-title">{{ forloop.counter }}. {{ chapter.title }}</h2>
-                {% if chapter.description %}
-                <p class="chapter-desc">{{ chapter.description }}</p>
+                {% if chapter.beschreibung_html %}
+                <div class="chapter-desc inhalt">{{ chapter.beschreibung_html }}</div>
                 {% endif %}
                 {% if chapter.lessons.all %}
                 <ul class="lesson-list">
