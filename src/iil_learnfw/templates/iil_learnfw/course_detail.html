@@ -100,7 +100,9 @@
         .lesson-title {
             font-size: 0.95rem;
             color: #e2e8f0;
+            text-decoration: none;
         }
+        .lesson-title:hover { color: #38bdf8; }
         .lesson-duration {
             margin-left: auto;
             font-size: 0.8rem;
@@ -145,7 +147,7 @@
                     {% for lesson in chapter.lessons.all %}
                     <li class="lesson-item">
                         <div class="lesson-icon">{{ forloop.counter }}</div>
-                        <span class="lesson-title">{{ lesson.title }}</span>
+                        <a class="lesson-title" href="{% url 'iil_learnfw:lesson-detail' course.slug lesson.pk %}">{{ lesson.title }}</a>
                         {% if lesson.estimated_duration_minutes %}
                         <span class="lesson-duration">{{ lesson.estimated_duration_minutes }} Min.</span>
                         {% endif %}

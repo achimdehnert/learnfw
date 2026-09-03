@@ -9,6 +9,17 @@ INSTALLED_APPS = [
     "iil_learnfw",
 ]
 
+# Views werden über die Bibliotheks-URLs getestet (0.6.0, Lektionsseite) —
+# vorher liefen die Tests nur gegen Modelle, Services und die API.
+ROOT_URLCONF = "tests.urls"
+TEMPLATES = [
+    {
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "APP_DIRS": True,
+        "OPTIONS": {"context_processors": ["django.template.context_processors.request"]},
+    }
+]
+
 REST_FRAMEWORK = {
     "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework.authentication.SessionAuthentication",
