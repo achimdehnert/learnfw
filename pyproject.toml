@@ -42,6 +42,10 @@ dev = [
     "hatch",
     "ruff",
     "bandit",
+    # Lektionsseite (0.6.0): die Tests belegen das echte Markdown-Rendering, nicht
+    # nur den Fallback — deshalb gehört das Extra auch in die Entwicklungsumgebung.
+    "markdown>=3.6",
+    "pymdown-extensions>=10",
 ]
 
 [build-system]
