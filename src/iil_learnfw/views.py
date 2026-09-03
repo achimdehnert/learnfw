@@ -33,11 +33,19 @@ def course_detail(request, slug):
         Course.objects.filter(status="published"),
         slug=slug,
     )
-    chapters = course.chapters.prefetch_related("lessons").all()
+    chapters = list(course.chapters.prefetch_related("lessons").all())
+    # Kurs- und Kapitelbeschreibung sind Markdown (Modulbeschreibung aus writing-hub,
+    # Lernziel-Listen) — vorher standen die Sterne und Bindestriche roh auf der Seite.
+    for chapter in chapters:
+        chapter.beschreibung_html = mark_safe(render_markdown(chapter.description))  # noqa: S308
     return render(
         request,
         "iil_learnfw/course_detail.html",
-        {"course": course, "chapters": chapters},
+        {
+            "course": course,
+            "chapters": chapters,
+            "beschreibung_html": mark_safe(render_markdown(course.description)),  # noqa: S308
+        },
     )
 
 
