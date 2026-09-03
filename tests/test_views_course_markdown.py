@@ -25,7 +25,7 @@ def kurs(db):
         description="**Digital & AI Strategy** (Nr. 10130)\n\n- 5 ECTS\n- Pflichtfach",
         tenant_id=TENANT,
     )
-    Chapter.objects.create(course=course, title="Termin 1", ordering=1, description="Lernziele:\n- Ziel A\n- Ziel B", tenant_id=TENANT)
+    Chapter.objects.create(course=course, title="Termin 1", ordering=1, description="Lernziele:\n\n- Ziel A\n- Ziel B", tenant_id=TENANT)
     return course
 
 
