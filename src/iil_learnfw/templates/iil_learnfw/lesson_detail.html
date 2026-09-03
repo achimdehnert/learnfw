@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ lesson.title }} — {{ course.title }} — IIL Learn Hub</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: #e2e8f0;
+            min-height: 100vh;
+        }
+        .nav { padding: 1rem 2rem; display: flex; gap: 1.5rem; flex-wrap: wrap; }
+        .nav a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
+        .nav a:hover { color: #e2e8f0; }
+        .header { max-width: 800px; margin: 0 auto; padding: 2rem 2rem 1rem; }
+        .kapitel { color: #94a3b8; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .header h1 {
+            font-size: 1.8rem; font-weight: 700; line-height: 1.3;
+            background: linear-gradient(90deg, #38bdf8, #818cf8);
+            -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .meta { display: flex; gap: 1rem; margin-top: 0.75rem; flex-wrap: wrap; }
+        .badge { display: inline-block; font-size: 0.8rem; padding: 0.3rem 0.75rem; border-radius: 999px; background: #334155; color: #94a3b8; }
+        .container { max-width: 800px; margin: 0 auto; padding: 1rem 2rem 3rem; }
+        .inhalt { line-height: 1.7; font-size: 1.05rem; color: #e2e8f0; }
+        .inhalt p { margin: 0 0 1rem; }
+        .inhalt ul, .inhalt ol { margin: 0 0 1rem 1.5rem; }
+        .inhalt li { margin-bottom: 0.4rem; }
+        .inhalt h1, .inhalt h2, .inhalt h3 { color: #f1f5f9; margin: 1.5rem 0 0.75rem; line-height: 1.3; }
+        .inhalt h1 { font-size: 1.4rem; } .inhalt h2 { font-size: 1.25rem; } .inhalt h3 { font-size: 1.1rem; }
+        .inhalt em { color: #cbd5e1; }
+        .inhalt code { background: #1e293b; border: 1px solid #334155; border-radius: 4px; padding: 0.1rem 0.35rem; font-size: 0.9em; }
+        .inhalt blockquote { border-left: 3px solid #38bdf8; padding-left: 1rem; color: #cbd5e1; margin: 0 0 1rem; }
+        .inhalt table { border-collapse: collapse; margin: 0 0 1rem; width: 100%; }
+        .inhalt th, .inhalt td { border: 1px solid #334155; padding: 0.4rem 0.6rem; text-align: left; }
+        .datei {
+            display: inline-block; margin: 1rem 0; padding: 0.8rem 1.4rem; border-radius: 0.5rem;
+            background: linear-gradient(90deg, #38bdf8, #818cf8); color: #0f172a; font-weight: 600; text-decoration: none;
+        }
+        .datei:hover { filter: brightness(1.1); }
+        .hinweis { color: #94a3b8; font-size: 0.9rem; }
+        .leer { color: #64748b; padding: 2rem 0; }
+        .blaettern { display: flex; justify-content: space-between; gap: 1rem; margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid #334155; }
+        .blaettern a { color: #94a3b8; text-decoration: none; font-size: 0.95rem; max-width: 48%; }
+        .blaettern a:hover { color: #e2e8f0; }
+        .blaettern .weiter { margin-left: auto; text-align: right; }
+    </style>
+</head>
+<body>
+    <div class="nav">
+        <a href="{% url 'iil_learnfw:course-list' %}">&larr; Alle Kurse</a>
+        <a href="{% url 'iil_learnfw:course-detail' course.slug %}">{{ course.title }}</a>
+    </div>
+    <div class="header">
+        <div class="kapitel">{{ chapter.ordering }}. {{ chapter.title }}</div>
+        <h1>{{ lesson.title }}</h1>
+        <div class="meta">
+            <span class="badge">Lektion {{ position }} von {{ anzahl }}</span>
+            {% if lesson.estimated_duration_minutes %}<span class="badge">{{ lesson.estimated_duration_minutes }} Min.</span>{% endif %}
+            {% if lesson.content_type != "markdown" %}<span class="badge">{{ lesson.get_content_type_display }}</span>{% endif %}
+        </div>
+    </div>
+    <div class="container">
+        {% if lesson.content_type == "markdown" %}
+            {% if inhalt_html %}
+            <div class="inhalt" data-testid="lektion-inhalt">{{ inhalt_html }}</div>
+            {% else %}
+            <p class="leer">Diese Lektion hat noch keinen Inhalt.</p>
+            {% endif %}
+        {% elif datei_url %}
+            {% if lesson.content_type == "pdf" %}
+            <a class="datei" href="{{ datei_url }}" target="_blank" rel="noopener" data-testid="lektion-datei">Foliensatz öffnen (PDF)</a>
+            {% elif lesson.content_type == "pptx" %}
+            <a class="datei" href="{{ datei_url }}" target="_blank" rel="noopener" data-testid="lektion-datei">Foliensatz öffnen (PowerPoint)</a>
+            {% else %}
+            <a class="datei" href="{{ datei_url }}" target="_blank" rel="noopener" data-testid="lektion-datei">Inhalt öffnen</a>
+            {% endif %}
+            <p class="hinweis">Öffnet in einem neuen Tab.</p>
+        {% else %}
+            <p class="leer">Für diese Lektion ist noch keine Datei hinterlegt.</p>
+        {% endif %}
+        <div class="blaettern">
+            {% if zurueck %}<a href="{% url 'iil_learnfw:lesson-detail' course.slug zurueck.pk %}" rel="prev">&larr; {{ zurueck.title }}</a>{% endif %}
+            {% if weiter %}<a class="weiter" href="{% url 'iil_learnfw:lesson-detail' course.slug weiter.pk %}" rel="next">{{ weiter.title }} &rarr;</a>{% endif %}
+        </div>
+    </div>
+</body>
+</html>
